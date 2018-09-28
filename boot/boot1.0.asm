@@ -43,7 +43,7 @@ bootStart:
     mov     dl, [BS_DrvNum]
     int     13h             ;replace the floppy driver
 
-loadLoader:
+foundsLoader:
     readRootSectors:
         cmp     word [restOfRootSector], 0
         jz      foundLoaderFailed
@@ -74,14 +74,6 @@ loadLoader:
                 jcxz    foundLoaderSuccess
                 jmp     searchLoader
 
-foundLoaderSuccess:
-    mov     ax, ds
-    mov     es, ax
-    mov     ax, loaderFoundString
-    mov     word cx, [loaderFoundStringL]
-    call    showMessage
-    jmp     $
-
 foundLoaderFailed:
     mov     ax, ds
     mov     es, ax
@@ -89,6 +81,45 @@ foundLoaderFailed:
     mov     word cx, [loaderNotFoundStringL]
     call    showMessage
     jmp     $
+
+;di & 0xFFE0 = offset to loader
+foundLoaderSuccess:
+    push    es
+    mov     ax, ds
+    mov     es, ax
+    mov     ax, loaderFoundString
+    mov     word cx, [loaderFoundStringL]
+    call    showMessage
+    pop     es
+
+    loadLoader:
+        and     di, 0xFFE0
+        add     di, offsetOfDirFstClus
+        mov     ax, [es:di]
+        push    ax
+        add     ax, secNoOfFstCluster
+        add     ax, numOfRootDirSSector
+        mov     bx, offsetOfLoader
+        goOnLoad:
+            mov     cl, 1
+            call    readSector
+            pop     ax
+            call    getNextClusterNo
+            cmp     ax, 0xFFF   
+            jz      loadLoaderComplete
+            push    ax
+            add     ax, secNoOfFstCluster
+            add     ax, numOfRootDirSSector
+            add     bx, [BPB_BytesPerSec]
+            jmp     goOnLoad
+
+loadLoaderComplete:
+    mov     ax, ds
+    mov     es, ax
+    mov     ax, loaderReady
+    mov     word cx, [loaderReadyL]
+    call    showMessage
+    jmp     baseOfLoader:offsetOfLoader
 
 ;ax = address(string)
 ;cx = length(string)
@@ -102,7 +133,7 @@ showMessage:
     int     10h
     ret
 
-;numOfSector in ax, numOfSectorToBeReaded in cl
+;startSectorNo in ax, numOfSectorToBeReaded in cl
 ;es & bx are params
 readSector:
     push    bp
@@ -129,6 +160,37 @@ reRead:
     pop     bp
     ret
 
+getNextClusterNo:
+    push    es
+    mov     bx, 3
+    mul     bx
+    mov     bx, 2
+    div     bx
+    mov     byte [oddFlag], dl
+    ;ax = clusterNo
+    mov     bx, [BPB_BytesPerSec]
+    xor     dx, dx
+    div     bx  ;dx = clusterIndex, ax = FATindex
+    push    dx
+    add     ax, sectorNoOfFAT1
+    push    ax
+    mov     ax, baseOfLoader
+    sub     ax, 0x100
+    mov     es, ax
+    pop     ax
+    mov     bx, 0
+    mov     cl, 2
+    call    readSector
+    pop     di
+    mov     word ax, [es:di]
+    cmp     byte [oddFlag], 0
+    jz  evenCase
+    shr     ax, 4
+    evenCase:
+        and     ax, 0xFFF
+    pop     es
+    ret
+
 ;string table
 bootString:         DB  'Hello! This is tmMos OS!'
 bootStringL:        DW  24
@@ -138,18 +200,21 @@ loaderNotFoundString:   DB  'Im sorry, no loader here!'
 loaderNotFoundStringL:  DW  26
 loaderName:         DB  'LOADER0 COM'
 loaderNameL:        DW  11
+loaderReady:        DB  'LOADER READY!'
+loaderReadyL:       DW  13
 
 ;variable
 restOfRootSector:   DW  numOfRootDirSSector
 restOfRootDir:      DW  numOfDirInSector
 indexOfSectorToBeR: DW  secNoOfRootDirectory
 offsetOfDirToBeCmp: DW  offsetOfLoader
+oddFlag:            DB  0
 
 ;restAndEndOfBoot
 times 510-($-$$)    DB  0
 DW  0xaa55               ;end of boot
 
-
+;#define
 
 %ifdef  DEBUG
 baseOfStack     equ     0100h
@@ -158,9 +223,21 @@ baseOfStack     equ     07c00h
 %endif
 
 secNoOfRootDirectory    equ     19      ;where to search  loader.com
+secNoOfFstCluster       equ     17
 baseOfLoader            equ     09000h   
 offsetOfLoader          equ     0100h
 numOfRootDirSSector     equ     14      ;
 numOfDirInSector        equ     16
+sectorNoOfFAT1          equ     1
+
+;DIR
+
+offsetOfDirName     equ     0
+offsetOfDirAttr     equ     0xB
+    ;reserve
+offsetOfDirWrtTime  equ     0x16
+offsetOfDirWrtDate  equ     0x18
+offsetOfDirFstClus  equ     0x1A
+offsetOfDirFileSIze equ     0x1C
 
         
