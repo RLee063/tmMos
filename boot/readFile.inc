@@ -1,6 +1,10 @@
 %ifdef	READ_FILE
 %else
 %define READ_FILE
+
+%include "FAT12.inc"
+%include "readSector.inc"
+%include "showMessage.inc"
 ;es = baseOfLoadAddress
 ;bx = offsetOfLoadAddress
 ;si = fileName

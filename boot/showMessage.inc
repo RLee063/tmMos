@@ -1,8 +1,9 @@
 %ifdef	SHOW_MESSAGE
 %else
 %define	SHOW_MESSAGE
-;ax = address(string)
+;ax = offsetAddress(string)
 ;cx = length(string)
+;es = baseAddress(string)
 showMessage:
     push    bp
     push    bx
