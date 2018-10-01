@@ -1,31 +1,9 @@
-org 0h
-    mov	ax, cs
-	mov	ds, ax
-	mov	es, ax
-	mov	ss, ax
-	mov	sp, baseOfStack
+[section .text]
 
-;    mov     ax, 0B800h
-;    mov     gs, ax
-;    mov     ah, 0Fh
-;    mov     al, 'L'
-;    mov     [gs:((80*0 + 39) * 2)], ax
+global _start
 
-    mov     ax, welcomeString
-    mov     cx, welcomeStringL
-    call    showMessage
-
+_start:
+    mov     ah, 95h
+    mov     al, 'K'
+    mov     [gs:((80*1+39)*2)], ax
     jmp     $
-
-;functionss
-%include "readFile.inc"
-%include "showMessage.inc"
-
-;stringTable
-welcomeString   DB  'Now in kernel.bin'
-welcomeStringL  equ $-welcomeString
-
-
-
-;define
-baseOfStack     equ     0h
