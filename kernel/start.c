@@ -13,6 +13,8 @@ void cstart(){
     u16* pGdtLimit = (u16*)(&gdtPtr[0]);
     u32* pGdtBase = (u32*)(&gdtPtr[1]);
     *pGdtLimit = GDT_SIZE * sizeof(DESCRIPTOR) - 1;
-    *pGdtBase = gdt;
+    *pGdtBase = (u32)gdt;
     DispStr("\n\n\n\n\n\n\n\n\n------\"CSTART\"-----");
+	
+    DispStr("\n\n\n\n\n\n\n\n\n\n------\"CSTART END\"-----");
 }

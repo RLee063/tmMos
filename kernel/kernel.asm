@@ -5,7 +5,7 @@ extern      gdtPtr
 
 [section .bss]
 stackSpace      resb    2*1024
-stackTop
+stackTop:
 
 [section .text]
 global _start
