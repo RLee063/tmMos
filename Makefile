@@ -15,7 +15,7 @@ DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
 BOOT		= boot/boot.bin boot/loader0.com
 KERNEL		= kernel.bin
-OBJS		= kernel/kernel.o kernel/start.o lib/lib.o
+OBJS		= kernel/kernel.o kernel/start.o kernel/interrupt.o lib/lib.o lib/libc.o
 DASMOUTPUT	= kernel.bin.asm
 
 # Phony
@@ -56,8 +56,14 @@ $(KERNEL) : $(OBJS)
 kernel/kernel.o : kernel/kernel.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
+kernel/interrupt.o: kernel/interrupt.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 kernel/start.o: kernel/start.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 lib/lib.o: lib/lib.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
+
+lib/libc.o: lib/lib.c
+	$(CC) $(CFLAGS) -o $@ $<

@@ -2,12 +2,14 @@
 ; ------------------------------------------------------------------------
 ; 显示 AL 中的数字
 ; ------------------------------------------------------------------------
-[section .data]
-ddDispPos 	dd 	0
+extern		DispPos
 
 [section .text]
 global		DispStr
 global		MemCpy
+global		DispColorStr
+global		Out
+global		In
 
 ; ------------------------------------------------------------------------
 ; 显示一个字符串
@@ -20,7 +22,7 @@ DispStr:
 	push	edi
 
 	mov	esi, [ebp + 8]	; pszInfo
-	mov	edi, [ddDispPos]
+	mov	edi, [DispPos]
 	mov	ah, 0Fh
 .11:
 	lodsb
@@ -45,7 +47,7 @@ DispStr:
 	jmp	.11
 
 .22:
-	mov	[ddDispPos], edi
+	mov	[DispPos], edi
 
 	pop	edi
 	pop	esi
@@ -93,4 +95,66 @@ MemCpy:
 
 	ret			; 函数结束，返回
 ; MemCpy 结束-------------------------------------------------------------
+
+;void out (u16 port, u8 value)
+
+Out:
+	mov		edx, [esp + 4]
+	mov		al,	[esp + 8]
+	out     	dx, al
+	nop
+	nop
+	ret
+
+;u8	in (u16 port)
+
+In:
+	mov		edx, [esp + 4]
+	xor		eax, eax
+	in		al, dx
+	nop
+	nop
+	ret
+
+;
+
+; ========================================================================
+;                  void disp_color_str(char * info, int color);
+; ========================================================================
+DispColorStr:
+	push	ebp
+	mov	ebp, esp
+
+	mov	esi, [ebp + 8]	; pszInfo
+	mov	edi, [DispPos]
+	mov	ah, [ebp + 12]	; color
+.1:
+	lodsb
+	test	al, al
+	jz	.2
+	cmp	al, 0Ah	; 是回车吗?
+	jnz	.3
+	push	eax
+	mov	eax, edi
+	mov	bl, 160
+	div	bl
+	and	eax, 0FFh
+	inc	eax
+	mov	bl, 160
+	mul	bl
+	mov	edi, eax
+	pop	eax
+	jmp	.1
+.3:
+	mov	[gs:edi], ax
+	add	edi, 2
+	jmp	.1
+
+.2:
+	mov	[DispPos], edi
+
+	pop	ebp
+	ret
+
+;================================================================
 
