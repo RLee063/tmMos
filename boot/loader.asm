@@ -125,7 +125,7 @@ protectStart:
 	call	DispStr
 	add	    esp, 4
 	call	dispMemInfo
-	;call	SetupPaging
+	call	SetupPaging
 
 	mov	ah, 95h				; 0000: 黑底    1111: 白字
 	mov	al, 'P'

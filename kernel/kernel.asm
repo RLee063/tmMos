@@ -1,10 +1,8 @@
-
 ;macros=========================================================
 %macro  hardware_int   1
     push    %1
     call    HardwareInt
     add     esp, 4
-    sti
     hlt
 %endmacro
 
