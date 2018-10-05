@@ -79,6 +79,7 @@ void initIrqTable(){
     for(int i=0; i<NR_IRQ; i++){
         irqTable[i] = HardwareInt;
     }
+    irqTable[0] = ClockClick;
 }
 
 void initIDTAndSetIDTR(){
