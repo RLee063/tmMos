@@ -1,12 +1,19 @@
 #pragma once
-#include "const.h"
+#include "global.h"
 #include "type.h"
 //extern
 void MemCpy(void *pDst, void *pSrc, u32 size);
+void MemSet(void *pDst, char ch, int size);
 void DispStr(void *pStr);
 void Out(u32 port, u32 val);
 void In(u32 port);
+void StrCpy(void *pDst, void* pSrc);
+void ClockClick();
+int KernelMain();
+void DispColorStr(void *pStr, int color);
 
+
+void restart();
 void divide_error();
 void single_step_exception();
 void nmi();
@@ -43,5 +50,8 @@ void hwint15();
 void CpuInt(int vecNo, int errCode, int eip, int cs, int eflags);
 void HardwareInt(int irqNo);
 //private
+void init8259A();
 void DispInt(int input);
 void initIdt();
+void TestA();
+void TestB();

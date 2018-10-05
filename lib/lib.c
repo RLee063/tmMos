@@ -1,3 +1,4 @@
+#include "funcs.h"
 char * itoa(char * str, int num)
 {
 	char *	p = str;

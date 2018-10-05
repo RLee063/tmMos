@@ -1,11 +1,4 @@
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                            protect.h
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                                                    Forrest Yu, 2005
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 #pragma once
-#ifndef	_ORANGES_PROTECT_H_
-#define	_ORANGES_PROTECT_H_
 
 /* 存储段描述符/系统段描述符 */
 typedef struct s_descriptor		/* 共 8 个字节 */
@@ -27,23 +20,48 @@ typedef struct s_gate
 	u16 offset_high;
 }GATE;
 
-#endif /* _ORANGES_PROTECT_H_ */
+typedef struct s_tss {
+	u32	backlink;
+	u32	esp0;		/* stack pointer to use during interrupt */
+	u32	ss0;		/*   "   segment  "  "    "        "     */
+	u32	esp1;
+	u32	ss1;
+	u32	esp2;
+	u32	ss2;
+	u32	cr3;
+	u32	eip;
+	u32	flags;
+	u32	eax;
+	u32	ecx;
+	u32	edx;
+	u32	ebx;
+	u32	esp;
+	u32	ebp;
+	u32	esi;
+	u32	edi;
+	u32	es;
+	u32	cs;
+	u32	ss;
+	u32	ds;
+	u32	fs;
+	u32	gs;
+	u32	ldt;
+	u16	trap;
+	u16	iobase;	/* I/O位图基址大于或等于TSS段界限，就表示没有I/O许可位图 */
+	/*u8	iomap[2];*/
+}TSS;
 
-/* GDT */
-/* 描述符索引 */
-#define	INDEX_DUMMY		0	// ┓
-#define	INDEX_FLAT_C		1	// ┣ LOADER 里面已经确定了的.
-#define	INDEX_FLAT_RW		2	// ┃
-#define	INDEX_VIDEO		3	// ┛
-/* 选择子 */
-#define	SELECTOR_DUMMY		   0		// ┓
-#define	SELECTOR_FLAT_C		0x08		// ┣ LOADER 里面已经确定了的.
-#define	SELECTOR_FLAT_RW	0x10		// ┃
-#define	SELECTOR_VIDEO		(0x18+3)	// ┛<-- RPL=3
+/* 选择子类型值说明 */
+/* 其中, SA_ : Selector Attribute */
+#define	SA_RPL_MASK	0xFFFC
+#define	SA_RPL0		0
+#define	SA_RPL1		1
+#define	SA_RPL2		2
+#define	SA_RPL3		3
 
-#define	SELECTOR_KERNEL_CS	SELECTOR_FLAT_C
-#define	SELECTOR_KERNEL_DS	SELECTOR_FLAT_RW
-
+#define	SA_TI_MASK	0xFFFB
+#define	SA_TIG		0
+#define	SA_TIL		4
 
 /* 描述符类型值说明 */
 #define	DA_32			0x4000	/* 32 位段				*/
@@ -86,6 +104,8 @@ typedef struct s_gate
 #define	INT_VECTOR_PAGE_FAULT		0xE
 #define	INT_VECTOR_COPROC_ERR		0x10
 
-/* 中断向量 */
-#define	INT_VECTOR_IRQ0			0x20
-#define	INT_VECTOR_IRQ8			0x28
+/*          8259A           */
+#define INT_M_CTL       0x20
+#define INT_M_CTLMASK   0x21
+#define INT_S_CTL       0xA0
+#define INT_S_CTLMASK   0xA1

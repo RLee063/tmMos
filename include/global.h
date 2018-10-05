@@ -1,10 +1,17 @@
 #pragma once
-#include "const.h"
 #include "type.h"
 #include "protect.h"
-
+#include "kernel.h"
 extern int		DispPos;
-extern u8		gdtPtr[6];	/* 0~15:Limit  16~47:Base */
-extern DESCRIPTOR	gdt[GDT_SIZE];
-extern u8		idtPtr[6];	/* 0~15:Limit  16~47:Base */
-extern GATE		idt[IDT_SIZE];
+extern u16		gdtPtr[3];	/* 0~15:Limit  16~47:Base */
+extern DESCRIPTOR	gdt[];
+extern u16		idtPtr[3];	/* 0~15:Limit  16~47:Base */
+extern GATE	    idt[];
+
+extern TSS      tss;
+extern PROCESS  procTable[];
+extern TASK     taskTable[]; 
+extern char     taskStack[];
+
+extern int      reEnterFlag;
+extern PROCESS* nextProc;

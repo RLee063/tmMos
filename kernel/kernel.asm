@@ -1,3 +1,4 @@
+%include "sconst.inc"
 ;macros=========================================================
 %macro  hardware_int   1
     push    %1
@@ -25,12 +26,19 @@
 extern      cstart
 extern      CpuInt
 extern      HardwareInt
+extern      ClockClick
+extern	    KernelMain
 
+
+extern 	    nextProc
 extern      gdtPtr
 extern      idtPtr
+extern      tss
 extern	    DispPos
+extern      reEnterFlag
 ;global
 global _start
+global restart
 
 global	divide_error
 global	single_step_exception
@@ -65,6 +73,8 @@ global  hwint13
 global  hwint14
 global  hwint15
 
+
+bits 32
 ;define
 selectorCode     equ     8
 
@@ -91,9 +101,11 @@ csinit:
     mov     al, 'X'
     mov     [gs:((80*1+40)*3)], ax
 
-    sti
-    hlt
+    xor     eax, eax
+    mov     ax, SELECTOR_TSS
+    ltr     ax
 
+    jmp     KernelMain
 divide_error:
     cpu_int_nocode  0
 single_step_exception:
@@ -126,8 +138,48 @@ page_fault:
     cpu_int_code    14
 copr_error:
     cpu_int_nocode  16
-hwint00:
-    hardware_int    0
+hwint00: 
+    sub esp, 4   
+    pushad
+    push    ds
+    push    es
+    push    fs
+    push    gs
+    mov     dx, ss
+    mov     ds, dx
+    mov     es, dx
+
+    inc     byte [gs:0]
+    mov     al, EOI
+    out     INT_M_CTL, al
+
+    inc     dword [reEnterFlag]
+    cmp     dword [reEnterFlag], 0
+    jne     .re_enter
+.enter:
+
+    mov	esp, stackTop		; 切到内核栈
+	sti
+	push	0
+	call	ClockClick
+	add	esp, 4
+	cli
+	mov	esp, [nextProc]	; 离开内核栈
+
+	lldt	[esp + P_LDT_SEL]
+	lea	eax, [esp + P_STACKTOP]
+	mov	dword [tss + TSS3_S_SP0], eax
+
+.re_enter:
+    dec     dword [reEnterFlag]
+    pop     gs
+    pop     fs
+    pop     es
+    pop     ds
+    popad
+    add esp, 4;jmp retaddr
+    iretd
+
 hwint01:
     hardware_int    1
 hwint02:
@@ -158,4 +210,18 @@ hwint14:
     hardware_int    14
 hwint15:
     hardware_int    15
+
+restart:
+	mov	esp, [nextProc]
+	lldt	[esp + P_LDT_SEL] 
+	lea	eax, [esp + P_STACKTOP]
+	mov	dword [tss + TSS3_S_SP0], eax
+	pop	gs
+	pop	fs
+	pop	es
+	pop	ds
+	popad
+	add	esp, 4
+	iretd
+
 

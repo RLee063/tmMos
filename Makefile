@@ -7,7 +7,7 @@ CC		= gcc
 LD		= ld
 ASMBFLAGS	= -I boot/include/
 ASMKFLAGS	= -I include/ -f elf
-CFLAGS		= -I include/ -c -fno-builtin -m32
+CFLAGS		= -I include/ -c -fno-builtin -m32 -std=c99
 LDFLAGS		= -s -Ttext $(ENTRYPOINT) -m elf_i386
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
@@ -15,7 +15,7 @@ DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
 BOOT		= boot/boot.bin boot/loader0.com
 KERNEL		= kernel.bin
-OBJS		= kernel/kernel.o kernel/start.o kernel/interrupt.o lib/lib.o lib/libc.o
+OBJS		= kernel/kernel.o kernel/start.o kernel/interrupt.o lib/lib.o lib/libc.o kernel/clock.o kernel/main.o
 DASMOUTPUT	= kernel.bin.asm
 
 # Phony
@@ -53,12 +53,17 @@ boot/loader0.com: boot/loader.asm
 $(KERNEL) : $(OBJS)
 	$(LD) $(LDFLAGS) -o $(KERNEL) $(OBJS)
 
+kernel/main.o: kernel/main.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 kernel/kernel.o : kernel/kernel.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
 kernel/interrupt.o: kernel/interrupt.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+kernel/clock.o: kernel/clock.c
+	$(CC) $(CFLAGS) -o $@ $<
 kernel/start.o: kernel/start.c
 	$(CC) $(CFLAGS) -o $@ $<
 
