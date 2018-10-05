@@ -84,14 +84,17 @@ typedef struct s_task {
 }TASK;
 
 /* Number of tasks */
-#define NR_TASKS	2
+#define NR_TASKS	3
+
 
 /* stacks of tasks */
 #define STACK_SIZE_TESTA	0x8000
 #define STACK_SIZE_TESTB	0x8000
+#define STACK_SIZE_TESTC	0x8000
 
 #define STACK_SIZE_TOTAL	(STACK_SIZE_TESTA + \
-				STACK_SIZE_TESTB)
+				STACK_SIZE_TESTB + \
+				STACK_SIZE_TESTC)
 //=====================================
 //                  中断
 //=====================================
@@ -99,3 +102,14 @@ typedef struct s_task {
 #define	INT_VECTOR_IRQ0			0x20
 #define	INT_VECTOR_IRQ8			0x28
 
+#define NR_IRQ      16
+#define	CLOCK_IRQ	0
+#define	KEYBOARD_IRQ	1
+#define	CASCADE_IRQ	2	/* cascade enable for 2nd AT controller */
+#define	ETHER_IRQ	3	/* default ethernet interrupt vector */
+#define	SECONDARY_IRQ	3	/* RS232 interrupt vector for port 2 */
+#define	RS232_IRQ	4	/* RS232 interrupt vector for port 1 */
+#define	XT_WINI_IRQ	5	/* xt winchester */
+#define	FLOPPY_IRQ	6	/* floppy disk */
+#define	PRINTER_IRQ	7
+#define	AT_WINI_IRQ	14	/* at winchester */

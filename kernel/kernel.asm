@@ -1,10 +1,26 @@
 %include "sconst.inc"
 ;macros=========================================================
 %macro  hardware_int   1
-    push    %1
-    call    HardwareInt
-    add     esp, 4
-    hlt
+    call    save
+
+    in	al, INT_M_CTLMASK	; `.
+	or	al, (1 << %1)		;  | 屏蔽当前中断
+ 
+    mov     al, EOI
+    out     INT_M_CTL, al
+
+	sti
+	push	%1
+	call	[irqTable + 4 * %1]
+	pop     ecx
+    cli
+
+    in	al, INT_M_CTLMASK	; \
+	and	al, ~(1 << %1)		;  | 恢复接受当前中断
+	out	INT_M_CTLMASK, al	; /
+
+    ret
+
 %endmacro
 
 %macro  cpu_int_code 1
@@ -29,7 +45,7 @@ extern      HardwareInt
 extern      ClockClick
 extern	    KernelMain
 
-
+extern      irqTable
 extern 	    nextProc
 extern      gdtPtr
 extern      idtPtr
@@ -139,47 +155,7 @@ page_fault:
 copr_error:
     cpu_int_nocode  16
 hwint00: 
-    sub esp, 4   
-    pushad
-    push    ds
-    push    es
-    push    fs
-    push    gs
-    mov     dx, ss
-    mov     ds, dx
-    mov     es, dx
-
-    inc     byte [gs:0]
-    mov     al, EOI
-    out     INT_M_CTL, al
-
-    inc     dword [reEnterFlag]
-    cmp     dword [reEnterFlag], 0
-    jne     .re_enter
-.enter:
-
-    mov	esp, stackTop		; 切到内核栈
-	sti
-	push	0
-	call	ClockClick
-	add	esp, 4
-	cli
-	mov	esp, [nextProc]	; 离开内核栈
-
-	lldt	[esp + P_LDT_SEL]
-	lea	eax, [esp + P_STACKTOP]
-	mov	dword [tss + TSS3_S_SP0], eax
-
-.re_enter:
-    dec     dword [reEnterFlag]
-    pop     gs
-    pop     fs
-    pop     es
-    pop     ds
-    popad
-    add esp, 4;jmp retaddr
-    iretd
-
+    hardware_int    0
 hwint01:
     hardware_int    1
 hwint02:
@@ -210,18 +186,45 @@ hwint14:
     hardware_int    14
 hwint15:
     hardware_int    15
+;===================================================
+;                   SAVE
+save:
+    pushad
+    push    ds
+    push    es
+    push    fs
+    push    gs
+    mov     dx, ss
+    mov     ds, dx
+    mov     es, dx
 
+    mov     eax, esp
+
+    inc     byte [gs:0]
+
+    inc     dword [reEnterFlag]
+    cmp     dword [reEnterFlag], 0
+    jne     .reenter
+    mov	    esp, stackTop		; 切到内核栈
+    push    restart
+    jmp     [eax + RETADR - P_STACKBASE]
+.reenter:
+    push    restart_retern
+    jmp     [eax + RETADR - P_STACKBASE]
+
+
+;                   RESTART
 restart:
-	mov	esp, [nextProc]
-	lldt	[esp + P_LDT_SEL] 
+    mov	esp, [nextProc]	; 离开内核栈
+	lldt	[esp + P_LDT_SEL]
 	lea	eax, [esp + P_STACKTOP]
 	mov	dword [tss + TSS3_S_SP0], eax
-	pop	gs
-	pop	fs
-	pop	es
-	pop	ds
-	popad
-	add	esp, 4
-	iretd
-
-
+restart_retern:
+    dec     dword [reEnterFlag]
+    pop     gs
+    pop     fs
+    pop     es
+    pop     ds
+    popad
+    add esp, 4
+    iretd

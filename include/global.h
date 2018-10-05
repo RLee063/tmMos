@@ -15,3 +15,4 @@ extern char     taskStack[];
 
 extern int      reEnterFlag;
 extern PROCESS* nextProc;
+extern void*   irqTable[];

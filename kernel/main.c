@@ -44,8 +44,9 @@ int KernelMain()
         pTask ++;
         selectorLdt += (1<<3);
     }
-    reEnterFlag = -1;
+    reEnterFlag = 0;
     nextProc = procTable;
+	EnableIrq(CLOCK_IRQ);
     restart();
 
     while(1){}    
@@ -82,5 +83,24 @@ void TestB()
 		DispInt(i++);
 		DispStr(".");
 		//delay(1);
+        for(int i=0; i<9; i++){
+			for(int j=0; j<9999; j++){
+			}
+		}
+	}
+}
+
+void TestC()
+{
+	int i = 0x1000;
+	while(1){
+		DispStr("C");
+		DispInt(i++);
+		DispStr(".");
+		//delay(1);
+        for(int i=0; i<9; i++){
+			for(int j=0; j<9999; j++){
+			}
+		}
 	}
 }

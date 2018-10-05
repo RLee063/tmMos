@@ -8,18 +8,19 @@ u16		gdtPtr[3];	/* 0~15:Limit  16~47:Base */
 DESCRIPTOR	gdt[GDT_SIZE];
 u16		idtPtr[3];	/* 0~15:Limit  16~47:Base */
 GATE		idt[IDT_SIZE];
-TSS      tss;
-PROCESS  procTable[NR_TASKS];
-TASK     taskTable[NR_TASKS] = {{TestA, STACK_SIZE_TESTA, "TestA"},
-					{TestB, STACK_SIZE_TESTB, "TestB"}};
-char     taskStack[STACK_SIZE_TOTAL];
-PROCESS* nextProc;
-int 	 reEnterFlag;
+TSS     tss;
+PROCESS procTable[NR_TASKS];
+TASK    taskTable[NR_TASKS] = {{TestA, STACK_SIZE_TESTA, "TestA"},
+					{TestB, STACK_SIZE_TESTB, "TestB"},
+                    {TestC, STACK_SIZE_TESTC, "TestC"}};
+char    taskStack[STACK_SIZE_TOTAL];
+PROCESS*    nextProc;
+int 	reEnterFlag;
+void*   irqTable[NR_IRQ];
 
 u32 seg2phys(u16 seg)
 {
 	DESCRIPTOR* p_dest = &gdt[seg >> 3];
-
 	return (p_dest->base_high << 24) | (p_dest->base_mid << 16) | (p_dest->base_low);
 }
 
@@ -38,7 +39,7 @@ void init8259A()
     Out(INT_M_CTLMASK, 0x1);
     Out(INT_S_CTLMASK, 0x1);
     //OCW1
-    Out(INT_M_CTLMASK, 0xFE);
+    Out(INT_M_CTLMASK, 0xFF);
     Out(INT_S_CTLMASK, 0xFF);
 }
 
@@ -74,6 +75,12 @@ void initGDTAndSetGDTR(){
     *pGdtBase = (u32)gdt;
 }
 
+void initIrqTable(){
+    for(int i=0; i<NR_IRQ; i++){
+        irqTable[i] = HardwareInt;
+    }
+}
+
 void initIDTAndSetIDTR(){
     u16* pIdtLimit = (u16*)(&idtPtr[0]);
     u32* pIdtBase = (u32*)(&idtPtr[1]);
@@ -81,6 +88,7 @@ void initIDTAndSetIDTR(){
     *pIdtBase = (u32)idt;
     init8259A();
     initIdt();
+    initIrqTable();
 }
 
 void setupTssDes(){
