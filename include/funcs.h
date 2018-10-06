@@ -1,21 +1,35 @@
 #pragma once
 #include "global.h"
 #include "type.h"
-//extern
+
+//Task
+void TestA();
+void TestB();
+void TestC();
+
+//global
+int KernelMain();
+void cstart();
+
+//lib
 void MemCpy(void *pDst, void *pSrc, u32 size);
 void MemSet(void *pDst, char ch, int size);
 void DispStr(void *pStr);
+void StrCpy(void *pDst, void* pSrc);
+void DispInt(int input);
 void Out(u32 port, u32 val);
 void In(u32 port);
-void StrCpy(void *pDst, void* pSrc);
 void EnableIrq(int irq);
 void DisableIrq(int irq);
-void ClockClick();
-int KernelMain();
 void DispColorStr(void *pStr, int color);
 
-
+//===================================================
+//==========             extern         =============
+//===================================================
 void restart();
+//CPU_INT
+void CpuInt(int vecNo, int errCode, int eip, int cs, int eflags);
+
 void divide_error();
 void single_step_exception();
 void nmi();
@@ -32,6 +46,10 @@ void stack_exception();
 void general_protection();
 void page_fault();
 void copr_error();
+//Hardware_INT
+void HardwareInt(int irqNo);
+
+void ClockClick();
 void hwint00();
 void hwint01();
 void hwint02();
@@ -48,13 +66,8 @@ void hwint12();
 void hwint13();
 void hwint14();
 void hwint15();
-//global
-void CpuInt(int vecNo, int errCode, int eip, int cs, int eflags);
-void HardwareInt(int irqNo);
-//private
-void init8259A();
-void DispInt(int input);
-void initIdt();
-void TestA();
-void TestB();
-void TestC();
+//Syscall
+void SysCall();
+
+void GetTicks();
+void syscallGetTicks();

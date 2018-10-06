@@ -2,17 +2,30 @@
 #include "type.h"
 #include "protect.h"
 #include "kernel.h"
-extern int		DispPos;
-extern u16		gdtPtr[3];	/* 0~15:Limit  16~47:Base */
-extern DESCRIPTOR	gdt[];
-extern u16		idtPtr[3];	/* 0~15:Limit  16~47:Base */
-extern GATE	    idt[];
+#ifdef  _GLOBAL_
+#define EXTERN 
+#else
+#define EXTERN extern
+#endif
 
-extern TSS      tss;
-extern PROCESS  procTable[];
-extern TASK     taskTable[]; 
-extern char     taskStack[];
-
-extern int      reEnterFlag;
-extern PROCESS* nextProc;
-extern void*   irqTable[];
+//LIB
+EXTERN int		DispPos;
+//GDT
+EXTERN u16		gdtPtr[3];	/* 0~15:Limit  16~47:Base */
+EXTERN DESCRIPTOR	gdt[GDT_SIZE];
+//IDT
+EXTERN u16		idtPtr[3];	/* 0~15:Limit  16~47:Base */
+EXTERN GATE	    idt[IDT_SIZE];
+//TSS
+EXTERN TSS      tss;
+//PROCESS
+EXTERN PROCESS  procTable[NR_TASKS];
+EXTERN int      reEnterFlag;
+EXTERN PROCESS* nextProc;
+//TASK
+EXTERN TASK     taskTable[NR_TASKS]; 
+EXTERN char     taskStack[STACK_SIZE_TOTAL];
+//IRQ
+EXTERN void*   irqTable[NR_IRQ];
+//SYSCALL
+EXTERN void*   sysCallTable[NR_SYS_CALL];

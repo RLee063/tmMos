@@ -4,8 +4,21 @@
 #include "funcs.h"
 #include "global.h"
 
+void initTasks(){
+	taskTable[0].initial_eip = TestA;
+	taskTable[0].stacksize = STACK_SIZE_TESTA;
+	StrCpy(taskTable[0].name, "TESTA");
+	taskTable[1].initial_eip = TestB;
+	taskTable[1].stacksize = STACK_SIZE_TESTB;
+	StrCpy(taskTable[1].name, "TESTB");
+	taskTable[2].initial_eip = TestC;
+	taskTable[2].stacksize = STACK_SIZE_TESTC;
+	StrCpy(taskTable[2].name, "TESTC");
+}
+
 int KernelMain()
 {
+	initTasks();
     DispStr("----------------\"kernelMain\"----");
     PROCESS * pProc = procTable;
     TASK * pTask = taskTable;
@@ -61,10 +74,11 @@ void TestA()
 	int i = 0x12345;
 	
 	while(1){
+		GetTicks();
 		DispStr("A");
 		DispInt(i++);
 		DispStr(".");
-		for(int i=0; i<9; i++){
+		for(int i=0; i<999; i++){
 			for(int j=0; j<9999; j++){
 
 			}
@@ -72,9 +86,6 @@ void TestA()
 	}
 }
 
-/*======================================================================*
-                               TestB
- *======================================================================*/
 void TestB()
 {
 	int i = 0x1000;
@@ -83,7 +94,7 @@ void TestB()
 		DispInt(i++);
 		DispStr(".");
 		//delay(1);
-        for(int i=0; i<9; i++){
+        for(int i=0; i<999; i++){
 			for(int j=0; j<9999; j++){
 			}
 		}
@@ -98,7 +109,7 @@ void TestC()
 		DispInt(i++);
 		DispStr(".");
 		//delay(1);
-        for(int i=0; i<9; i++){
+        for(int i=0; i<999; i++){
 			for(int j=0; j<9999; j++){
 			}
 		}

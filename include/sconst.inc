@@ -42,3 +42,7 @@ SELECTOR_FLAT_C		equ		0x08		; LOADER 里面已经确定了的.
 SELECTOR_TSS		equ		0x20		; TSS. 从外层跳到内存时 SS 和 ESP 的值从里面获得.
 SELECTOR_KERNEL_CS	equ		SELECTOR_FLAT_C
 
+; syscall
+
+INT_VECTOR_SYS_CALL equ     0x90
+NR_GetTicks         equ     0x0

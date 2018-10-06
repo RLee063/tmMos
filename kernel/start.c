@@ -3,44 +3,10 @@
 #include "type.h"
 #include "protect.h"
 
-int		DispPos;
-u16		gdtPtr[3];	/* 0~15:Limit  16~47:Base */
-DESCRIPTOR	gdt[GDT_SIZE];
-u16		idtPtr[3];	/* 0~15:Limit  16~47:Base */
-GATE		idt[IDT_SIZE];
-TSS     tss;
-PROCESS procTable[NR_TASKS];
-TASK    taskTable[NR_TASKS] = {{TestA, STACK_SIZE_TESTA, "TestA"},
-					{TestB, STACK_SIZE_TESTB, "TestB"},
-                    {TestC, STACK_SIZE_TESTC, "TestC"}};
-char    taskStack[STACK_SIZE_TOTAL];
-PROCESS*    nextProc;
-int 	reEnterFlag;
-void*   irqTable[NR_IRQ];
-
 u32 seg2phys(u16 seg)
 {
 	DESCRIPTOR* p_dest = &gdt[seg >> 3];
 	return (p_dest->base_high << 24) | (p_dest->base_mid << 16) | (p_dest->base_low);
-}
-
-void init8259A()
-{
-    //ICW1
-    Out(INT_M_CTL, 0x11);
-    Out(INT_S_CTL, 0x11);
-    //ICW2
-    Out(INT_M_CTLMASK, INT_VECTOR_IRQ0);
-    Out(INT_S_CTLMASK, INT_VECTOR_IRQ8);
-    //ICW3
-    Out(INT_M_CTLMASK, 0x4);
-    Out(INT_S_CTLMASK, 0x2);
-    //ICW4
-    Out(INT_M_CTLMASK, 0x1);
-    Out(INT_S_CTLMASK, 0x1);
-    //OCW1
-    Out(INT_M_CTLMASK, 0xFF);
-    Out(INT_S_CTLMASK, 0xFF);
 }
 
 void initDesc(DESCRIPTOR * p_desc, u32 base, u32 limit, u16 attribute)
@@ -66,32 +32,6 @@ void initIdtDesc(unsigned char vector, u8 desc_type,
 	p_gate->offset_high	= (base >> 16) & 0xFFFF;
 }
 
-
-void initGDTAndSetGDTR(){
-    MemCpy(&gdt, (void*)(*((u32*) (&gdtPtr[1]))), *((u16*)(&gdtPtr[0]))+1);
-    u16* pGdtLimit = (u16*)(&gdtPtr[0]);
-    u32* pGdtBase = (u32*)(&gdtPtr[1]);
-    *pGdtLimit = GDT_SIZE * sizeof(DESCRIPTOR) - 1;
-    *pGdtBase = (u32)gdt;
-}
-
-void initIrqTable(){
-    for(int i=0; i<NR_IRQ; i++){
-        irqTable[i] = HardwareInt;
-    }
-    irqTable[0] = ClockClick;
-}
-
-void initIDTAndSetIDTR(){
-    u16* pIdtLimit = (u16*)(&idtPtr[0]);
-    u32* pIdtBase = (u32*)(&idtPtr[1]);
-    *pIdtLimit = IDT_SIZE * sizeof(DESCRIPTOR) - 1;
-    *pIdtBase = (u32)idt;
-    init8259A();
-    initIdt();
-    initIrqTable();
-}
-
 void setupTssDes(){
     MemSet(&tss, 0, sizeof(tss));
     tss.ss0 = SELECTOR_KERNEL_DS;
@@ -108,17 +48,15 @@ void setupLDTDes(){
     
 }
 
-void cstart(){
-    //DispStr("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n------\"CSTART\"-----");
-	DispPos = 0;
-    initGDTAndSetGDTR();
-    initIDTAndSetIDTR();
+void initGDTAndSetGDTR(){
+    MemCpy(&gdt, (void*)(*((u32*) (&gdtPtr[1]))), *((u16*)(&gdtPtr[0]))+1);
     setupTssDes();
     setupLDTDes();
-    DispStr("\n------\"CSTART END\"-----\n");
+    u16* pGdtLimit = (u16*)(&gdtPtr[0]);
+    u32* pGdtBase = (u32*)(&gdtPtr[1]);
+    *pGdtLimit = GDT_SIZE * sizeof(DESCRIPTOR) - 1;
+    *pGdtBase = (u32)gdt;
 }
-
-
 
 void initIdt()
 {
@@ -155,4 +93,59 @@ void initIdt()
     initIdtDesc(INT_VECTOR_IRQ8 + 5, DA_386IGate, hwint13, PRIVILEGE_KRNL);
     initIdtDesc(INT_VECTOR_IRQ8 + 6, DA_386IGate, hwint14, PRIVILEGE_KRNL);
     initIdtDesc(INT_VECTOR_IRQ8 + 7, DA_386IGate, hwint15, PRIVILEGE_KRNL);
+    initIdtDesc(INT_VECTOR_SYS_CALL, DA_386IGate, SysCall, PRIVILEGE_USER);
 }
+
+void init8259A()
+{
+    //ICW1
+    Out(INT_M_CTL, 0x11);
+    Out(INT_S_CTL, 0x11);
+    //ICW2
+    Out(INT_M_CTLMASK, INT_VECTOR_IRQ0);
+    Out(INT_S_CTLMASK, INT_VECTOR_IRQ8);
+    //ICW3
+    Out(INT_M_CTLMASK, 0x4);
+    Out(INT_S_CTLMASK, 0x2);
+    //ICW4
+    Out(INT_M_CTLMASK, 0x1);
+    Out(INT_S_CTLMASK, 0x1);
+    //OCW1
+    Out(INT_M_CTLMASK, 0xFF);
+    Out(INT_S_CTLMASK, 0xFF);
+}
+
+void initIrqTable(){
+    for(int i=0; i<NR_IRQ; i++){
+        irqTable[i] = HardwareInt;
+    }
+    irqTable[0] = ClockClick;
+}
+
+void initSysCallTable(){
+    sysCallTable[0] = syscallGetTicks;
+}
+
+void initIDTAndSetIDTR(){
+    u16* pIdtLimit = (u16*)(&idtPtr[0]);
+    u32* pIdtBase = (u32*)(&idtPtr[1]);
+    *pIdtLimit = IDT_SIZE * sizeof(DESCRIPTOR) - 1;
+    *pIdtBase = (u32)idt;
+    initIdt();
+    init8259A();
+    initIrqTable();
+    initSysCallTable();
+}
+
+void cstart(){
+    //DispStr("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n------\"CSTART\"-----");
+	DispPos = 0;
+    initGDTAndSetGDTR();
+    initIDTAndSetIDTR();
+    DispStr("\n------\"CSTART END\"-----\n");
+}
+
+/*
+1. GDT and GDTR
+2. IDT and IDTR
+*/

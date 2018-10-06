@@ -46,6 +46,7 @@ extern      ClockClick
 extern	    KernelMain
 
 extern      irqTable
+extern      sysCallTable
 extern 	    nextProc
 extern      gdtPtr
 extern      idtPtr
@@ -56,6 +57,7 @@ extern      reEnterFlag
 global _start
 global restart
 
+global  SysCall
 global	divide_error
 global	single_step_exception
 global	nmi
@@ -186,6 +188,15 @@ hwint14:
     hardware_int    14
 hwint15:
     hardware_int    15
+
+
+SysCall:
+    call    save
+    sti
+    call    [sysCallTable + eax*4]
+    mov     [esi + EAXREG - P_STACKBASE], eax;save returenvalue
+    cli
+    ret
 ;===================================================
 ;                   SAVE
 save:
@@ -198,7 +209,7 @@ save:
     mov     ds, dx
     mov     es, dx
 
-    mov     eax, esp
+    mov     esi, esp
 
     inc     byte [gs:0]
 
@@ -207,18 +218,18 @@ save:
     jne     .reenter
     mov	    esp, stackTop		; 切到内核栈
     push    restart
-    jmp     [eax + RETADR - P_STACKBASE]
+    jmp     [esi + RETADR - P_STACKBASE]
 .reenter:
     push    restart_retern
-    jmp     [eax + RETADR - P_STACKBASE]
+    jmp     [esi + RETADR - P_STACKBASE]
 
 
 ;                   RESTART
 restart:
     mov	esp, [nextProc]	; 离开内核栈
 	lldt	[esp + P_LDT_SEL]
-	lea	eax, [esp + P_STACKTOP]
-	mov	dword [tss + TSS3_S_SP0], eax
+	lea	esi, [esp + P_STACKTOP]
+	mov	dword [tss + TSS3_S_SP0], esi
 restart_retern:
     dec     dword [reEnterFlag]
     pop     gs

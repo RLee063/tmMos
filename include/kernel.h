@@ -1,6 +1,6 @@
+#pragma once
 #include "type.h"
 #include "protect.h"
-#pragma once
 /* 函数类型 */
 #define	PUBLIC		/* PUBLIC is the opposite of PRIVATE */
 #define	PRIVATE	static	/* PRIVATE x limits the scope of x */
@@ -10,11 +10,6 @@
 #define	PRIVILEGE_TASK	1
 #define	PRIVILEGE_USER	3
 
-/* RPL */
-#define	RPL_KRNL	SA_RPL0
-#define	RPL_TASK	SA_RPL1
-#define	RPL_USER	SA_RPL3
-
 //============================================
 //                  GDT/IDT/LDT
 //============================================
@@ -23,26 +18,29 @@
 #define IDT_SIZE    256
 #define LDT_SIZE    128
 
-/* GDT */
-/* 描述符索引 */
+/* GDT描述符索引 */
 #define	INDEX_DUMMY		0	// ┓
 #define	INDEX_FLAT_C		1	// ┣ LOADER 里面已经确定了的.
 #define	INDEX_FLAT_RW		2	// ┃
 #define	INDEX_VIDEO		3	// ┛
 #define	INDEX_TSS		4
 #define	INDEX_LDT_FIRST		5
-/* 选择子 */
+/* GDT选择子 */
 #define	SELECTOR_DUMMY		   0		// ┓
 #define	SELECTOR_FLAT_C		0x08		// ┣ LOADER 里面已经确定了的.
 #define	SELECTOR_FLAT_RW	0x10		// ┃
 #define	SELECTOR_VIDEO		(0x18+3)	// ┛<-- RPL=3
 #define	SELECTOR_TSS		0x20		// TSS. 从外层跳到内存时 SS 和 ESP 的值从里面获得.
 #define SELECTOR_LDT_FIRST	0x28
-
+/* KERNEL GDT选择子 */
 #define	SELECTOR_KERNEL_CS	SELECTOR_FLAT_C
 #define	SELECTOR_KERNEL_DS	SELECTOR_FLAT_RW
 #define	SELECTOR_KERNEL_GS	SELECTOR_VIDEO
 
+/* RPL */
+#define	RPL_KRNL	SA_RPL0
+#define	RPL_TASK	SA_RPL1
+#define	RPL_USER	SA_RPL3
 //=============================================
 //                  进程
 //=============================================
@@ -101,6 +99,7 @@ typedef struct s_task {
 /* 中断向量 */
 #define	INT_VECTOR_IRQ0			0x20
 #define	INT_VECTOR_IRQ8			0x28
+#define INT_VECTOR_SYS_CALL	0x90
 
 #define NR_IRQ      16
 #define	CLOCK_IRQ	0
@@ -113,3 +112,10 @@ typedef struct s_task {
 #define	FLOPPY_IRQ	6	/* floppy disk */
 #define	PRINTER_IRQ	7
 #define	AT_WINI_IRQ	14	/* at winchester */
+
+//=====================================
+//                  syscall
+//=====================================
+#define NR_SYS_CALL
+
+#define NR_GetTicks              0x0

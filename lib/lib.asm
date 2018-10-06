@@ -14,6 +14,8 @@ global		In
 global		StrCpy
 global  	EnableIrq
 global  	DisableIrq
+;syscall
+global		GetTicks
 
 ; ------------------------------------------------------------------------
 ; 显示一个字符串
@@ -293,3 +295,8 @@ enable_8:
         ret
 
 
+;=====================================================
+GetTicks:
+		mov	eax, NR_GetTicks
+		int		INT_VECTOR_SYS_CALL
+		ret
