@@ -1,7 +1,8 @@
 #pragma once
 #include "global.h"
 #include "type.h"
-
+//temp
+void delay(int mSec);
 //Task
 void TestA();
 void TestB();
@@ -69,5 +70,5 @@ void hwint15();
 //Syscall
 void SysCall();
 
-void GetTicks();
-void syscallGetTicks();
+int GetTicks();
+int syscallGetTicks();

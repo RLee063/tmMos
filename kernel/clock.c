@@ -5,6 +5,7 @@
 #include "global.h"
 
 void ClockClick(){
+    ticks++;
     DispStr("#");
     if(reEnterFlag!=0){
         DispStr("!");
@@ -14,4 +15,9 @@ void ClockClick(){
     if(nextProc>=procTable+NR_TASKS){
         nextProc = procTable;
     }
+}
+
+void delay(int mSec){
+    int t = GetTicks();
+    while(((GetTicks()-t)*1000/HZ) < mSec){};
 }

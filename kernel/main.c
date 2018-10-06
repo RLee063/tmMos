@@ -4,6 +4,12 @@
 #include "funcs.h"
 #include "global.h"
 
+void initClockF(){
+	Out(TIMER_MODE, RATE_GENERATOR);
+	Out(TIMER0, (u8) (TIMER_FREQ/HZ) );
+	Out(TIMER0, (u8) ((TIMER_FREQ/HZ) >> 8));
+}
+
 void initTasks(){
 	taskTable[0].initial_eip = TestA;
 	taskTable[0].stacksize = STACK_SIZE_TESTA;
@@ -60,6 +66,7 @@ int KernelMain()
     reEnterFlag = 0;
     nextProc = procTable;
 	EnableIrq(CLOCK_IRQ);
+	initClockF();
     restart();
 
     while(1){}    
@@ -74,15 +81,10 @@ void TestA()
 	int i = 0x12345;
 	
 	while(1){
-		GetTicks();
 		DispStr("A");
 		DispInt(i++);
 		DispStr(".");
-		for(int i=0; i<999; i++){
-			for(int j=0; j<9999; j++){
-
-			}
-		}
+		delay(1000);
 	}
 }
 
@@ -93,11 +95,7 @@ void TestB()
 		DispStr("B");
 		DispInt(i++);
 		DispStr(".");
-		//delay(1);
-        for(int i=0; i<999; i++){
-			for(int j=0; j<9999; j++){
-			}
-		}
+		delay(1000);
 	}
 }
 
@@ -108,10 +106,6 @@ void TestC()
 		DispStr("C");
 		DispInt(i++);
 		DispStr(".");
-		//delay(1);
-        for(int i=0; i<999; i++){
-			for(int j=0; j<9999; j++){
-			}
-		}
+		delay(1000);
 	}
 }

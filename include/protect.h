@@ -109,3 +109,7 @@ typedef struct s_tss {
 #define INT_M_CTLMASK   0x21
 #define INT_S_CTL       0xA0
 #define INT_S_CTLMASK   0xA1
+
+/* 8253/8254 PIT (Programmable Interval Timer) */
+#define TIMER0         0x40 /* I/O port for timer channel 0 */
+#define TIMER_MODE     0x43 /* I/O port for timer mode control */

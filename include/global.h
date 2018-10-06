@@ -10,6 +10,7 @@
 
 //LIB
 EXTERN int		DispPos;
+EXTERN int      ticks;
 //GDT
 EXTERN u16		gdtPtr[3];	/* 0~15:Limit  16~47:Base */
 EXTERN DESCRIPTOR	gdt[GDT_SIZE];

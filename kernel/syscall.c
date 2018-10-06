@@ -1,4 +1,4 @@
 #include "funcs.h"
-void syscallGetTicks(){
-    DispStr("O");
+int syscallGetTicks(){
+    return ticks;
 }
