@@ -14,6 +14,8 @@ global		In
 global		StrCpy
 global  	EnableIrq
 global  	DisableIrq
+global		DisableInt
+global		EnableInt
 ;syscall
 global		GetTicks
 
@@ -294,7 +296,16 @@ enable_8:
         popf
         ret
 
+DisableInt:
+		cli
+		ret
 
+EnableInt:
+		sti
+		ret
+
+;=====================================================
+;					SYSCALL	
 ;=====================================================
 GetTicks:
 		mov	eax, NR_GetTicks

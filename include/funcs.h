@@ -7,7 +7,7 @@ void delay(int mSec);
 void TestA();
 void TestB();
 void TestC();
-
+void taskTty();
 //global
 int KernelMain();
 void cstart();
@@ -19,11 +19,12 @@ void DispStr(void *pStr);
 void StrCpy(void *pDst, void* pSrc);
 void DispInt(int input);
 void Out(u32 port, u32 val);
-void In(u32 port);
+int In(u32 port);
 void EnableIrq(int irq);
 void DisableIrq(int irq);
 void DispColorStr(void *pStr, int color);
-
+void DisableInt();
+void EnableInt();
 //===================================================
 //==========             extern         =============
 //===================================================
@@ -52,6 +53,7 @@ void HardwareInt(int irqNo);
 
 void ClockClick();
 void hwint00();
+void KeyboardHandler();
 void hwint01();
 void hwint02();
 void hwint03();

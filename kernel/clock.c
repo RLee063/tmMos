@@ -6,9 +6,9 @@
 
 void ClockClick(){
     ticks++;
-    DispStr("#");
+    //DispStr("#");
     if(reEnterFlag!=0){
-        DispStr("!");
+        //DispStr("!");
         return;
     }
     nextProc++;

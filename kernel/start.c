@@ -119,11 +119,6 @@ void initIrqTable(){
     for(int i=0; i<NR_IRQ; i++){
         irqTable[i] = HardwareInt;
     }
-    irqTable[0] = ClockClick;
-}
-
-void initSysCallTable(){
-    sysCallTable[0] = syscallGetTicks;
 }
 
 void initIDTAndSetIDTR(){
@@ -134,7 +129,7 @@ void initIDTAndSetIDTR(){
     initIdt();
     init8259A();
     initIrqTable();
-    initSysCallTable();
+
 }
 
 void cstart(){

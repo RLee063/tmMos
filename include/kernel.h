@@ -1,6 +1,10 @@
 #pragma once
 #include "type.h"
 #include "protect.h"
+/* 其他 */
+#define TRUE 	1
+#define FALSE 	0
+
 /* 函数类型 */
 #define	PUBLIC		/* PUBLIC is the opposite of PRIVATE */
 #define	PRIVATE	static	/* PRIVATE x limits the scope of x */
@@ -123,11 +127,23 @@ typedef struct s_task {
 //====================================
 //					clock
 //====================================
-/* 8253/8254 PIT (Programmable Interval Timer) */
-#define TIMER0         0x40 /* I/O port for timer channel 0 */
-#define TIMER_MODE     0x43 /* I/O port for timer mode control */
 #define RATE_GENERATOR 0x34 /* 00-11-010-0 :
 			     * Counter0 - LSB then MSB - rate generator - binary
 			     */
 #define TIMER_FREQ     1193182L/* clock frequency for timer in PC and AT */
 #define HZ             100  /* clock freq (software settable on IBM-PC) */
+
+//====================================
+//					键盘
+//====================================
+#define	KB_IN_BYTES	32	/* size of keyboard input buffer */
+#define MAP_COLS	3	/* Number of columns in keymap */
+#define NR_SCAN_CODES	0x80	/* Number of scan codes (rows in keymap) */
+
+typedef struct s_kb {
+	char*	pHead;			/* 指向缓冲区中下一个空闲位置 */
+	char*	pTail;			/* 指向键盘任务应处理的字节 */
+	int	count;			/* 缓冲区中共有多少字节 */
+	char	buf[KB_IN_BYTES];	/* 缓冲区 */
+}KEYBOARD_BUFFER;
+

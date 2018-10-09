@@ -4,29 +4,39 @@
 #include "funcs.h"
 #include "global.h"
 
-void initClockF(){
+void initSysCallTable(){
+    sysCallTable[0] = syscallGetTicks;
+}
+
+void initClock(){
 	Out(TIMER_MODE, RATE_GENERATOR);
 	Out(TIMER0, (u8) (TIMER_FREQ/HZ) );
 	Out(TIMER0, (u8) ((TIMER_FREQ/HZ) >> 8));
+	irqTable[0] = ClockClick;
+	EnableIrq(CLOCK_IRQ);
 }
 
-void initTasks(){
+void initTaskTable(){
 	taskTable[0].initial_eip = TestA;
 	taskTable[0].stacksize = STACK_SIZE_TESTA;
 	StrCpy(taskTable[0].name, "TESTA");
 	taskTable[1].initial_eip = TestB;
 	taskTable[1].stacksize = STACK_SIZE_TESTB;
 	StrCpy(taskTable[1].name, "TESTB");
-	taskTable[2].initial_eip = TestC;
+	taskTable[2].initial_eip = taskTty;
 	taskTable[2].stacksize = STACK_SIZE_TESTC;
 	StrCpy(taskTable[2].name, "TESTC");
 }
 
-int KernelMain()
-{
-	initTasks();
-    DispStr("----------------\"kernelMain\"----");
-    PROCESS * pProc = procTable;
+void initKeyboard(){
+	keyboardInput.pHead = keyboardInput.pTail = keyboardInput.buf;
+	keyboardInput.count = 0;
+    irqTable[1] = KeyboardHandler;
+	EnableIrq(KEYBOARD_IRQ);
+}
+
+void initProcTable(){
+	PROCESS * pProc = procTable;
     TASK * pTask = taskTable;
     u16 selectorLdt = SELECTOR_LDT_FIRST;
     char * pTaskStack = taskStack;
@@ -65,12 +75,20 @@ int KernelMain()
     }
     reEnterFlag = 0;
     nextProc = procTable;
-	EnableIrq(CLOCK_IRQ);
-	initClockF();
+}
+
+int KernelMain()
+{
+	DispStr("----------------\"kernelMain\"----");
+	initSysCallTable();
+	initTaskTable();
+	initKeyboard();
+	initClock();
+	initProcTable();
     restart();
-
-    while(1){}    
-
+    while(1){
+		DispStr("你永远见不到我");
+	}    
 }
 
 /*======================================================================*
@@ -81,9 +99,9 @@ void TestA()
 	int i = 0x12345;
 	
 	while(1){
-		DispStr("A");
-		DispInt(i++);
-		DispStr(".");
+		//DispStr("A");
+		//DispInt(i++);
+		//DispStr(".");
 		delay(1000);
 	}
 }
@@ -92,10 +110,10 @@ void TestB()
 {
 	int i = 0x1000;
 	while(1){
-		DispStr("B");
-		DispInt(i++);
-		DispStr(".");
-		delay(1000);
+		//DispStr("B");
+		//DispInt(i++);
+		//DispStr(".");
+		//delay(1000);
 	}
 }
 
@@ -103,9 +121,11 @@ void TestC()
 {
 	int i = 0x1000;
 	while(1){
-		DispStr("C");
-		DispInt(i++);
-		DispStr(".");
+		//DispStr("C");
+		//DispInt(i++);
+		//DispStr(".");
 		delay(1000);
 	}
 }
+
+//===========temp funcs===================
