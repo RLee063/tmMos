@@ -86,7 +86,7 @@ typedef struct s_task {
 }TASK;
 
 /* Number of tasks */
-#define NR_TASKS	3
+#define NR_TASKS	1
 
 
 /* stacks of tasks */
@@ -134,12 +134,17 @@ typedef struct s_task {
 #define HZ             100  /* clock freq (software settable on IBM-PC) */
 
 //====================================
-//					键盘
+//					TTY
 //====================================
+#define SCR_UP	1	/* scroll forward */
+#define SCR_DN	-1	/* scroll backward */
+#define SCREEN_SIZE		(80 * 25)
+#define SCREEN_WIDTH		80
+#define DEFAULT_CHAR_COLOR	0x07	/* 0000 0111 黑底白字 */
+
 #define	KB_IN_BYTES	32	/* size of keyboard input buffer */
 #define MAP_COLS	3	/* Number of columns in keymap */
 #define NR_SCAN_CODES	0x80	/* Number of scan codes (rows in keymap) */
-
 typedef struct s_kb {
 	char*	pHead;			/* 指向缓冲区中下一个空闲位置 */
 	char*	pTail;			/* 指向键盘任务应处理的字节 */
@@ -147,3 +152,22 @@ typedef struct s_kb {
 	char	buf[KB_IN_BYTES];	/* 缓冲区 */
 }KEYBOARD_BUFFER;
 
+#define NR_CONSOLES	3
+typedef struct s_console
+{
+	unsigned int	current_start_addr;	/* 当前显示到了什么位置	  */
+	unsigned int	original_addr;		/* 当前控制台对应显存位置 */
+	unsigned int	v_mem_limit;		/* 当前控制台占的显存大小 */
+	unsigned int	cursor;			/* 当前光标位置 */
+}CONSOLE;
+
+#define TTY_IN_BYTES	256	/* tty input queue size */
+typedef struct s_tty
+{
+	u32	in_buf[TTY_IN_BYTES];	/* TTY 输入缓冲区 */
+	u32*	p_inbuf_head;		/* 指向缓冲区中下一个空闲位置 */
+	u32*	p_inbuf_tail;		/* 指向键盘任务应处理的键值 */
+	int	inbuf_count;		/* 缓冲区中已经填充了多少 */
+
+	struct s_console *	p_console;
+}TTY;

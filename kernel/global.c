@@ -1,5 +1,8 @@
 #define _GLOBAL_
 #include "global.h"
+#include "funcs.h"
+
+TASK	taskTable[NR_TASKS] = {{taskTty, STACK_SIZE_TESTA, "TestA"}};
 
 u32 keymap[NR_SCAN_CODES * MAP_COLS] = {
 

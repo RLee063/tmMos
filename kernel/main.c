@@ -16,18 +16,6 @@ void initClock(){
 	EnableIrq(CLOCK_IRQ);
 }
 
-void initTaskTable(){
-	taskTable[0].initial_eip = TestA;
-	taskTable[0].stacksize = STACK_SIZE_TESTA;
-	StrCpy(taskTable[0].name, "TESTA");
-	taskTable[1].initial_eip = TestB;
-	taskTable[1].stacksize = STACK_SIZE_TESTB;
-	StrCpy(taskTable[1].name, "TESTB");
-	taskTable[2].initial_eip = taskTty;
-	taskTable[2].stacksize = STACK_SIZE_TESTC;
-	StrCpy(taskTable[2].name, "TESTC");
-}
-
 void initKeyboard(){
 	keyboardInput.pHead = keyboardInput.pTail = keyboardInput.buf;
 	keyboardInput.count = 0;
@@ -81,7 +69,6 @@ int KernelMain()
 {
 	DispStr("----------------\"kernelMain\"----");
 	initSysCallTable();
-	initTaskTable();
 	initKeyboard();
 	initClock();
 	initProcTable();

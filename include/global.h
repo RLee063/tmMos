@@ -30,7 +30,10 @@ EXTERN char     taskStack[STACK_SIZE_TOTAL];
 EXTERN void*   irqTable[NR_IRQ];
 //SYSCALL
 EXTERN void*   sysCallTable[NR_SYS_CALL];
-//KEYBORD
+//TTY
 EXTERN KEYBOARD_BUFFER keyboardInput;
+EXTERN u32      keymap[NR_SCAN_CODES * MAP_COLS];
 
-EXTERN u32 keymap[NR_SCAN_CODES * MAP_COLS];
+EXTERN TTY      ttyTable[NR_CONSOLES];
+EXTERN CONSOLE  consoleTable[NR_CONSOLES];
+EXTERN int      nrCurrentConsole;
