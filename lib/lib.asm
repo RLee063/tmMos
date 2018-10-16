@@ -16,8 +16,8 @@ global  	EnableIrq
 global  	DisableIrq
 global		DisableInt
 global		EnableInt
-;syscall
-global		GetTicks
+global  	StrLen
+
 
 ; ------------------------------------------------------------------------
 ; 显示一个字符串
@@ -304,10 +304,24 @@ EnableInt:
 		sti
 		ret
 
-;=====================================================
-;					SYSCALL	
-;=====================================================
-GetTicks:
-		mov	eax, NR_GetTicks
-		int		INT_VECTOR_SYS_CALL
-		ret
+; ------------------------------------------------------------------------
+; int StrLen(char* p_str);
+; ------------------------------------------------------------------------
+StrLen:
+        push    ebp
+        mov     ebp, esp
+
+        mov     eax, 0                  ; 字符串长度开始是 0
+        mov     esi, [ebp + 8]          ; esi 指向首地址
+
+.1:
+        cmp     byte [esi], 0           ; 看 esi 指向的字符是否是 '\0'
+        jz      .2                      ; 如果是 '\0'，程序结束
+        inc     esi                     ; 如果不是 '\0'，esi 指向下一个字符
+        inc     eax                     ;         并且，eax 自加一
+        jmp     .1                      ; 如此循环
+
+.2:
+        pop     ebp
+        ret                             ; 函数结束，返回
+; ------------------------------------------------------------------------

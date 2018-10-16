@@ -6,6 +6,7 @@
 
 void initSysCallTable(){
     sysCallTable[0] = syscallGetTicks;
+	sysCallTable[1] = syscallWrite;
 }
 
 void initClock(){
@@ -16,62 +17,82 @@ void initClock(){
 	EnableIrq(CLOCK_IRQ);
 }
 
-void initKeyboard(){
-	keyboardInput.pHead = keyboardInput.pTail = keyboardInput.buf;
-	keyboardInput.count = 0;
-    irqTable[1] = KeyboardHandler;
-	EnableIrq(KEYBOARD_IRQ);
-}
-
 void initProcTable(){
 	PROCESS * pProc = procTable;
-    TASK * pTask = taskTable;
+    TASK * pTask;
     u16 selectorLdt = SELECTOR_LDT_FIRST;
-    char * pTaskStack = taskStack;
-
-    for(int i=0; i<NR_TASKS; i++){
+    char * pTaskStack = taskStack + STACK_SIZE_TOTAL;
+	u8 privilege;
+	u8 rpl;
+	int eflags;
+    for(int i=0; i<NR_TASKS + NR_USER_PROCS; i++){
+		if(i<NR_TASKS){
+			privilege = PRIVILEGE_TASK;
+			rpl = RPL_TASK;
+			eflags = 0x1202;
+			pTask = taskTable + i;
+		}
+		else{
+			privilege = PRIVILEGE_USER;
+			rpl = RPL_USER;
+			eflags = 0x202;
+			pTask = userProcTable + (i - NR_TASKS);
+		}
         StrCpy(pProc->p_name, pTask->name);
         pProc->pid = i;
         pProc->ldt_sel = selectorLdt;
 
         MemCpy(&pProc->ldts[0], &gdt[SELECTOR_KERNEL_CS>>3], sizeof(DESCRIPTOR));
-        pProc->ldts[0].attr1 = DA_C | PRIVILEGE_TASK << 5;
+        pProc->ldts[0].attr1 = DA_C | privilege << 5;
         MemCpy(&pProc->ldts[1], &gdt[SELECTOR_KERNEL_DS>>3], sizeof(DESCRIPTOR));
-        pProc->ldts[1].attr1 = DA_DRW | PRIVILEGE_TASK << 5;
+        pProc->ldts[1].attr1 = DA_DRW | privilege << 5;
 
         pProc->regs.cs	= ((8 * 0) & SA_RPL_MASK & SA_TI_MASK)
-			| SA_TIL | RPL_TASK;
+			| SA_TIL | rpl;
 		pProc->regs.ds	= ((8 * 1) & SA_RPL_MASK & SA_TI_MASK)
-			| SA_TIL | RPL_TASK;
+			| SA_TIL | rpl;
 		pProc->regs.es	= ((8 * 1) & SA_RPL_MASK & SA_TI_MASK)
-			| SA_TIL | RPL_TASK;
+			| SA_TIL | rpl;
 		pProc->regs.fs	= ((8 * 1) & SA_RPL_MASK & SA_TI_MASK)
-			| SA_TIL | RPL_TASK;
+			| SA_TIL | rpl;
 		pProc->regs.ss	= ((8 * 1) & SA_RPL_MASK & SA_TI_MASK)
-			| SA_TIL | RPL_TASK;
+			| SA_TIL | rpl;
 		pProc->regs.gs	= (SELECTOR_KERNEL_GS & SA_RPL_MASK)
-			| RPL_TASK;
+			| rpl;
 
         pProc->regs.eip = (u32)pTask->initial_eip;
         pProc->regs.esp = (u32)pTaskStack;
-        pProc->regs.eflags = 0x1202;
+        pProc->regs.eflags = eflags;
 
         pTaskStack -= pTask->stacksize;
         pProc ++;
-        pTask ++;
         selectorLdt += (1<<3);
+		pProc->nr_tty=0;
     }
+	//=====
+	procTable[2].nr_tty = 1;
+	procTable[2].nr_tty = 2;
+	//======
     reEnterFlag = 0;
     nextProc = procTable;
 }
 
 int KernelMain()
 {
-	DispStr("----------------\"kernelMain\"----");
+	DispStr("----------------\"kernelMain\"----\n");
 	initSysCallTable();
-	initKeyboard();
+	DispStr("SysCallTable complete!\n");
+	DispInt(&DispPos);
+	DispStr(":&disPos\n");
+	DispInt(taskTty);
+	DispStr(":taskTty\n");
 	initClock();
+	DispStr("Clock complete!\n");
+    delay(1000);
+	DispStr("Delay OK\n");
 	initProcTable();
+	DispStr("ProcTable complete!\n");
+    delay(1000);
     restart();
     while(1){
 		DispStr("你永远见不到我");
@@ -83,35 +104,25 @@ int KernelMain()
  *======================================================================*/
 void TestA()
 {
-	int i = 0x12345;
-	
 	while(1){
-		//DispStr("A");
-		//DispInt(i++);
-		//DispStr(".");
-		delay(1000);
+		printf("hello?");
+		delay(3000);
 	}
 }
 
 void TestB()
 {
-	int i = 0x1000;
+	int i = 0x1086;
 	while(1){
-		//DispStr("B");
-		//DispInt(i++);
-		//DispStr(".");
-		//delay(1000);
+		printf("%x", i);
+		delay(3000);
 	}
 }
 
 void TestC()
 {
-	int i = 0x1000;
 	while(1){
-		//DispStr("C");
-		//DispInt(i++);
-		//DispStr(".");
-		delay(1000);
+		delay(3000);
 	}
 }
 

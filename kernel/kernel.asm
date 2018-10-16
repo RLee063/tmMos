@@ -103,6 +103,7 @@ stackTop:
 [section .text]
 
 _start:
+    mov     dword [DispPos], 0
     mov     ah, 95h
     mov     al, 'K'
     mov     [gs:((80*1+39)*2)], ax
@@ -192,8 +193,12 @@ hwint15:
 
 SysCall:
     call    save
+    push	dword [nextProc]
     sti
+    push	ecx
+    push	ebx
     call    [sysCallTable + eax*4]
+    add     esp, 4*3
     mov     [esi + EAXREG - P_STACKBASE], eax;save returenvalue
     cli
     ret

@@ -41,7 +41,7 @@ void setupTssDes(){
 
 void setupLDTDes(){
     u16 selectorLdt = INDEX_LDT_FIRST << 3;
-    for(int i=0; i<NR_TASKS; i++){
+    for(int i=0; i<NR_TASKS+NR_USER_PROCS; i++){
         initDesc(&gdt[selectorLdt >> 3], seg2phys(SELECTOR_KERNEL_DS)+(u32)procTable[i].ldts, LDT_SIZE*sizeof(DESCRIPTOR)-1, DA_LDT);
         selectorLdt += (1<<3);
     }
@@ -133,11 +133,13 @@ void initIDTAndSetIDTR(){
 }
 
 void cstart(){
-    //DispStr("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n------\"CSTART\"-----");
+    DispStr("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n------\"CSTART\"-----");
 	DispPos = 0;
     initGDTAndSetGDTR();
+    DispStr("GDT complete!\n");
     initIDTAndSetIDTR();
-    DispStr("\n------\"CSTART END\"-----\n");
+    DispStr("IDT complete!\n");
+    DispStr("------\"CSTART END\"-----\n");
 }
 
 /*

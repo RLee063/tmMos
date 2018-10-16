@@ -20,12 +20,13 @@ EXTERN GATE	    idt[IDT_SIZE];
 //TSS
 EXTERN TSS      tss;
 //PROCESS
-EXTERN PROCESS  procTable[NR_TASKS];
+EXTERN PROCESS  procTable[NR_TASKS+NR_USER_PROCS];
 EXTERN int      reEnterFlag;
 EXTERN PROCESS* nextProc;
 //TASK
 EXTERN TASK     taskTable[NR_TASKS]; 
 EXTERN char     taskStack[STACK_SIZE_TOTAL];
+EXTERN TASK     userProcTable[NR_USER_PROCS];
 //IRQ
 EXTERN void*   irqTable[NR_IRQ];
 //SYSCALL

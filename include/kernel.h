@@ -77,6 +77,7 @@ typedef struct s_proc {
 								/* 2 is LDT_SIZE - avoid include protect.h */
 	u32				pid;			/* process id passed in from MM */
 	char				p_name[16];		/* name of the process */
+	int 			nr_tty;
 }PROCESS;
 
 typedef struct s_task {
@@ -87,16 +88,18 @@ typedef struct s_task {
 
 /* Number of tasks */
 #define NR_TASKS	1
-
+#define NR_USER_PROCS	3
 
 /* stacks of tasks */
 #define STACK_SIZE_TESTA	0x8000
 #define STACK_SIZE_TESTB	0x8000
 #define STACK_SIZE_TESTC	0x8000
+#define STACK_SIZE_TTY		0x8000
 
 #define STACK_SIZE_TOTAL	(STACK_SIZE_TESTA + \
 				STACK_SIZE_TESTB + \
-				STACK_SIZE_TESTC)
+				STACK_SIZE_TESTC + \
+				STACK_SIZE_TTY)
 //=====================================
 //                  中断
 //=====================================
@@ -120,9 +123,10 @@ typedef struct s_task {
 //=====================================
 //                  syscall
 //=====================================
-#define NR_SYS_CALL
+#define NR_SYS_CALL				2
 
-#define NR_GetTicks              0x0
+#define NR_GetTicks             0
+#define	NR_Write				1
 
 //====================================
 //					clock
@@ -171,3 +175,16 @@ typedef struct s_tty
 
 	struct s_console *	p_console;
 }TTY;
+
+//=====================================
+//					键盘
+//=====================================
+#define FLAG_BREAK	0x0080		/* Break Code			*/
+#define FLAG_EXT	0x0100		/* Normal function keys		*/
+#define FLAG_SHIFT_L	0x0200		/* Shift key			*/
+#define FLAG_SHIFT_R	0x0400		/* Shift key			*/
+#define FLAG_CTRL_L	0x0800		/* Control key			*/
+#define FLAG_CTRL_R	0x1000		/* Control key			*/
+#define FLAG_ALT_L	0x2000		/* Alternate key		*/
+#define FLAG_ALT_R	0x4000		/* Alternate key		*/
+#define FLAG_PAD	0x8000		/* keys in num pad		*/

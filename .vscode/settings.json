@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "global.h": "c",
+        "funcs.h": "c",
+        "type.h": "c"
+    }
+}

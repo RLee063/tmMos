@@ -12,12 +12,13 @@ void ClockClick(){
         return;
     }
     nextProc++;
-    if(nextProc>=procTable+NR_TASKS){
+    if(nextProc>=procTable+NR_TASKS+NR_USER_PROCS){
         nextProc = procTable;
     }
 }
 
 void delay(int mSec){
     int t = GetTicks();
-    while(((GetTicks()-t)*1000/HZ) < mSec){};
+    while(((GetTicks()-t)*1000/HZ) < mSec){
+    };
 }

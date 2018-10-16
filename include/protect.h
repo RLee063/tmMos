@@ -113,17 +113,17 @@ typedef struct s_tss {
 #define TIMER0         0x40 /* I/O port for timer channel 0 */
 #define TIMER_MODE     0x43 /* I/O port for timer mode control */
 //=============================
-/* keybord scan code set 1*/
+/* 				keybord										*/
 //=============================
-#define FLAG_BREAK	0x0080		/* Break Code			*/
-#define FLAG_EXT	0x0100		/* Normal function keys		*/
-#define FLAG_SHIFT_L	0x0200		/* Shift key			*/
-#define FLAG_SHIFT_R	0x0400		/* Shift key			*/
-#define FLAG_CTRL_L	0x0800		/* Control key			*/
-#define FLAG_CTRL_R	0x1000		/* Control key			*/
-#define FLAG_ALT_L	0x2000		/* Alternate key		*/
-#define FLAG_ALT_R	0x4000		/* Alternate key		*/
-#define FLAG_PAD	0x8000		/* keys in num pad		*/
+#define KB_DATA		0x60	/* I/O port for keyboard data
+					Read : Read Output Buffer
+					Write: Write Input Buffer(8042 Data&8048 Command) */
+#define KB_CMD		0x64	/* I/O port for keyboard command
+					Read : Read Status Register
+					Write: Write Input Buffer(8042 Command) */
+#define LED_CODE	0xED
+#define KB_ACK		0xFA
+
 
 #define MASK_RAW	0x01FF		/* raw key value = code passed to tty & MASK_RAW
 					   the value can be found either in the keymap column 0

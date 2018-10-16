@@ -17,6 +17,7 @@ void MemCpy(void *pDst, void *pSrc, u32 size);
 void MemSet(void *pDst, char ch, int size);
 void DispStr(void *pStr);
 void StrCpy(void *pDst, void* pSrc);
+int StrLen(char* p_str);
 void DispInt(int input);
 void Out(u32 port, u32 val);
 int In(u32 port);
@@ -74,3 +75,5 @@ void SysCall();
 
 int GetTicks();
 int syscallGetTicks();
+int Write();
+int syscallWrite(char* buf, int length, PROCESS* pProc);
