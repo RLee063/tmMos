@@ -2,7 +2,7 @@
 #include "global.h"
 #include "funcs.h"
 
-TASK	taskTable[NR_TASKS] = {{taskTty, STACK_SIZE_TTY, "TTY_TASK"}};
+TASK	taskTable[NR_TASKS] = {{taskTty, STACK_SIZE_TTY, "TASK_TTY"}, {taskSyscall, STACK_SIZE_SYSCALL, "TASK_SYSCALL"}};
 TASK    userProcTable[NR_USER_PROCS] = {{TestA, STACK_SIZE_TESTA, "TEST_A"},{TestB, STACK_SIZE_TESTB, "TEST_B"},{TestC, STACK_SIZE_TESTC, "TestC"}};
 u32 keymap[NR_SCAN_CODES * MAP_COLS] = {
 

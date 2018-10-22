@@ -193,12 +193,15 @@ hwint15:
 
 SysCall:
     call    save
-    push	dword [nextProc]
     sti
+    push    esi
+    push	dword [nextProc]
+    push    edx
     push	ecx
     push	ebx
     call    [sysCallTable + eax*4]
-    add     esp, 4*3
+    add     esp, 4*4
+    pop     esi
     mov     [esi + EAXREG - P_STACKBASE], eax;save returenvalue
     cli
     ret
@@ -210,10 +213,12 @@ save:
     push    es
     push    fs
     push    gs
+    mov     esi, edx
     mov     dx, ss
     mov     ds, dx
     mov     es, dx
-
+    mov     fs, dx
+    mov     edx, esi
     mov     esi, esp
 
     inc     byte [gs:0]

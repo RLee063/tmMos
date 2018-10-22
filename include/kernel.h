@@ -78,28 +78,39 @@ typedef struct s_proc {
 	u32				pid;			/* process id passed in from MM */
 	char				p_name[16];		/* name of the process */
 	int 			nr_tty;
+	PROC_STATUS		status;
+	struct s_proc *		senderQueue;
+	int				receiveFrom;
+	int				sendTo;
+	MESSAGE *		msg;
 }PROCESS;
 
+//TASK
 typedef struct s_task {
 	void (*initial_eip)();
 	int	stacksize;
 	char	name[32];
 }TASK;
 
+/* task pid */
+#define INVALID_DRIVER	-20
+#define INTERRUPT	-10
+#define TASK_TTY	0
+#define TASK_SYS	1
+
 /* Number of tasks */
-#define NR_TASKS	1
+#define NR_TASKS	2
 #define NR_USER_PROCS	3
+#define NR_PROCS	NR_TASKS+NR_USER_PROCS
 
 /* stacks of tasks */
-#define STACK_SIZE_TESTA	0x8000
-#define STACK_SIZE_TESTB	0x8000
-#define STACK_SIZE_TESTC	0x8000
-#define STACK_SIZE_TTY		0x8000
+#define STACK_SIZE_TESTA		0x8000
+#define STACK_SIZE_TESTB		0x8000
+#define STACK_SIZE_TESTC		0x8000
+#define STACK_SIZE_TTY			0x8000
+#define STACK_SIZE_SYSCALL		0x8000
 
-#define STACK_SIZE_TOTAL	(STACK_SIZE_TESTA + \
-				STACK_SIZE_TESTB + \
-				STACK_SIZE_TESTC + \
-				STACK_SIZE_TTY)
+#define STACK_SIZE_TOTAL	NR_PROCS * 0x8000
 //=====================================
 //                  中断
 //=====================================
@@ -123,10 +134,11 @@ typedef struct s_task {
 //=====================================
 //                  syscall
 //=====================================
-#define NR_SYS_CALL				2
+#define NR_SYS_CALL				3
 
 #define NR_GetTicks             0
-#define	NR_Write				1
+#define NR_SendRecv				1
+#define	NR_Write				2
 
 //====================================
 //					clock
@@ -188,3 +200,51 @@ typedef struct s_tty
 #define FLAG_ALT_L	0x2000		/* Alternate key		*/
 #define FLAG_ALT_R	0x4000		/* Alternate key		*/
 #define FLAG_PAD	0x8000		/* keys in num pad		*/
+
+//=====================================
+//				SEND_RECV
+//=====================================
+//Message type
+#define SEND		1
+#define RECEIVE		2
+#define BOTH		3	/* BOTH = (SEND | RECEIVE) */
+
+//who
+#define ANY		(NR_PROCS + 10)
+#define NO_TASK		(NR_PROCS + 20)
+
+
+
+struct mess1 {
+	int m1i1;
+	int m1i2;
+	int m1i3;
+	int m1i4;
+};
+struct mess2 {
+	void* m2p1;
+	void* m2p2;
+	void* m2p3;
+	void* m2p4;
+};
+struct mess3 {
+	int	m3i1;
+	int	m3i2;
+	int	m3i3;
+	int	m3i4;
+	u64	m3l1;
+	u64	m3l2;
+	void*	m3p1;
+	void*	m3p2;
+};
+struct _msg{
+	int source;
+	int type;
+	union {
+		struct mess1 m1;
+		struct mess2 m2;
+		struct mess3 m3;
+	} u;
+};
+
+#define	RETVAL		u.m3.m3i1

@@ -4,10 +4,11 @@
 //temp
 void delay(int mSec);
 //Task
+void taskTty();
+void taskSyscall();
 void TestA();
 void TestB();
 void TestC();
-void taskTty();
 //global
 int KernelMain();
 void cstart();
@@ -75,5 +76,7 @@ void SysCall();
 
 int GetTicks();
 int syscallGetTicks();
-int Write();
-int syscallWrite(char* buf, int length, PROCESS* pProc);
+int Write(char* buf, int length);
+int syscallWrite(int unuse, char* buf, int length, PROCESS* pProc);
+int SendRecv(FUNCTION function, int srcDest, MESSAGE* pMsg);
+int syscallSendRecv(FUNCTION function, int srcDest, MESSAGE* pMsg, PROCESS* current);

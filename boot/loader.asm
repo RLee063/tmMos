@@ -54,7 +54,7 @@ readyForPM:
     ;1.gdt
     lgdt    [gdtPtr]   
     ;2.close int 
-    cli        
+    cli       
     ;3.open A20         
     in	al, 92h         
 	or	al, 00000010b

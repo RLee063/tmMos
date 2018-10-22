@@ -5,8 +5,9 @@
 #include "global.h"
 
 void initSysCallTable(){
-    sysCallTable[0] = syscallGetTicks;
-	sysCallTable[1] = syscallWrite;
+    sysCallTable[NR_GetTicks] = syscallGetTicks;
+	sysCallTable[NR_Write] = syscallWrite;
+	sysCallTable[NR_SendRecv] = syscallSendRecv;
 }
 
 void initClock(){
@@ -64,13 +65,15 @@ void initProcTable(){
         pProc->regs.esp = (u32)pTaskStack;
         pProc->regs.eflags = eflags;
 
+		pProc->nr_tty = 0;
         pTaskStack -= pTask->stacksize;
+		pProc->status = NORMAL;
+
         pProc ++;
         selectorLdt += (1<<3);
-		pProc->nr_tty=0;
     }
 	//=====
-	procTable[2].nr_tty = 1;
+	procTable[1].nr_tty = 1;
 	procTable[2].nr_tty = 2;
 	//======
     reEnterFlag = 0;
@@ -88,11 +91,8 @@ int KernelMain()
 	DispStr(":taskTty\n");
 	initClock();
 	DispStr("Clock complete!\n");
-    delay(1000);
-	DispStr("Delay OK\n");
 	initProcTable();
 	DispStr("ProcTable complete!\n");
-    delay(1000);
     restart();
     while(1){
 		DispStr("你永远见不到我");

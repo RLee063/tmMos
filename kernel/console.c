@@ -85,8 +85,11 @@ void out_char(CONSOLE *p_con, char ch)
 	if (p_con->cursor >= p_con->current_start_addr + SCREEN_SIZE) {
 		scroll_screen(p_con, SCR_DN);
 	}
-	set_cursor(p_con->cursor);
-	set_video_start_addr(p_con->current_start_addr);
+
+	if(isCurrentConsole(p_con)){
+		set_cursor(p_con->cursor);
+		set_video_start_addr(p_con->current_start_addr);
+	}
 }
 
 int isCurrentConsole(CONSOLE *pC)
@@ -127,7 +130,9 @@ void scroll_screen(CONSOLE *p_con, int direction)
 	else
 	{
 	}
+	if(isCurrentConsole(p_con)){
+		set_video_start_addr(p_con->current_start_addr);
+		set_cursor(p_con->cursor);
+	}
 
-	set_video_start_addr(p_con->current_start_addr);
-	set_cursor(p_con->cursor);
 }

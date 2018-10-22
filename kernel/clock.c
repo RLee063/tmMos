@@ -15,6 +15,7 @@ void ClockClick(){
     if(nextProc>=procTable+NR_TASKS+NR_USER_PROCS){
         nextProc = procTable;
     }
+    //schedule();
 }
 
 void delay(int mSec){
