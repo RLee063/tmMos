@@ -6,7 +6,7 @@
 
 void initSysCallTable(){
     sysCallTable[NR_GetTicks] = syscallGetTicks;
-	sysCallTable[NR_Write] = syscallWrite;
+	sysCallTable[NR_printx] = syscallPrintx;
 	sysCallTable[NR_SendRecv] = syscallSendRecv;
 }
 

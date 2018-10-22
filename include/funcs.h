@@ -14,6 +14,17 @@ int KernelMain();
 void cstart();
 
 //lib
+#define ASSERT
+#ifdef ASSERT
+void assertion_failure(char *exp, char *file, char *base_file, int line);
+#define assert(exp)  if (exp) ; \
+        else assertion_failure(#exp, __FILE__, __BASE_FILE__, __LINE__)
+#else
+#define assert(exp)
+#endif
+
+#define printl printf
+
 void MemCpy(void *pDst, void *pSrc, u32 size);
 void MemSet(void *pDst, char ch, int size);
 void DispStr(void *pStr);
@@ -76,7 +87,7 @@ void SysCall();
 
 int GetTicks();
 int syscallGetTicks();
-int Write(char* buf, int length);
-int syscallWrite(int unuse, char* buf, int length, PROCESS* pProc);
+int printx(char*);
+int syscallPrintx(int unuse, int unuse2, char* buf, PROCESS* pProc);
 int SendRecv(FUNCTION function, int srcDest, MESSAGE* pMsg);
 int syscallSendRecv(FUNCTION function, int srcDest, MESSAGE* pMsg, PROCESS* current);

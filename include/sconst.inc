@@ -47,4 +47,4 @@ SELECTOR_KERNEL_CS	equ		SELECTOR_FLAT_C
 INT_VECTOR_SYS_CALL equ     0x90
 NR_GetTicks         equ     0
 NR_SendRecv         equ     1
-NR_Write            equ     2
+NR_printx           equ     2

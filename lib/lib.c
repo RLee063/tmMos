@@ -34,3 +34,59 @@ void DispInt(int input)
     itoa(output, input);
     DispStr(output);
 }
+
+// int GetTicks(){
+// 	MESSAGE msg;
+// 	MemSet(&msg, 0, sizeof(MESSAGE));
+
+// }
+
+//===============================
+//				assertion
+//===============================
+void spin(char * func_name)
+{
+	printl("\nspinning in %s ...\n", func_name);
+	while (1) {}
+}
+
+void assertion_failure(char *exp, char *file, char *base_file, int line)
+{
+	printl("%c  assert(%s) failed: file: %s, base_file: %s, ln%d",
+	       MAG_CH_ASSERT,
+	       exp, file, base_file, line);
+
+	/**
+	 * If assertion fails in a TASK, the system will halt before
+	 * printl() returns. If it happens in a USER PROC, printl() will
+	 * return like a common routine and arrive here. 
+	 * @see sys_printx()
+	 * 
+	 * We use a forever loop to prevent the proc from going on:
+	 */
+	spin("assertion_failure()");
+
+	/* should never arrive here */
+    __asm__ ("ud2");
+}
+
+void* va2la(int pid, void* va)
+{
+	struct proc* p = &procTable[pid];
+
+	u32 seg_base = ldt_seg_linear(p, INDEX_LDT_RW);
+	u32 la = seg_base + (u32)va;
+
+	if (pid < NR_TASKS + NR_PROCS) {
+		assert(la == (u32)va);
+	}
+
+	return (void*)la;
+}
+
+int ldt_seg_linear(PROCESS* p, int idx)
+{
+	DESCRIPTOR * d = &p->ldts[idx];
+
+	return d->base_high << 24 | d->base_mid << 16 | d->base_low;
+}

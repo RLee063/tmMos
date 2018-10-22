@@ -13,6 +13,8 @@
 #define	PRIVILEGE_KRNL	0
 #define	PRIVILEGE_TASK	1
 #define	PRIVILEGE_USER	3
+//==================
+
 
 //============================================
 //                  GDT/IDT/LDT
@@ -20,7 +22,7 @@
 /* GDT 和 IDT 中描述符的个数 */
 #define	GDT_SIZE	128
 #define IDT_SIZE    256
-#define LDT_SIZE    128
+
 
 /* GDT描述符索引 */
 #define	INDEX_DUMMY		0	// ┓
@@ -45,6 +47,11 @@
 #define	RPL_KRNL	SA_RPL0
 #define	RPL_TASK	SA_RPL1
 #define	RPL_USER	SA_RPL3
+
+//LDT
+#define LDT_SIZE    2
+#define INDEX_LDT_C             0
+#define INDEX_LDT_RW            1
 //=============================================
 //                  进程
 //=============================================
@@ -70,10 +77,10 @@ typedef struct s_stackframe {	/* proc_ptr points here				↑ Low			*/
 }STACK_FRAME;
 
 typedef struct s_proc {
-	STACK_FRAME			regs;			/* process' registers saved in stack frame */
+	struct s_stackframe			regs;			/* process' registers saved in stack frame */
 
 	u16				ldt_sel;		/* selector in gdt giving ldt base and limit*/
-	DESCRIPTOR			ldts[LDT_SIZE];		/* local descriptors for code and data */
+	struct s_descriptor			ldts[LDT_SIZE];		/* local descriptors for code and data */
 								/* 2 is LDT_SIZE - avoid include protect.h */
 	u32				pid;			/* process id passed in from MM */
 	char				p_name[16];		/* name of the process */
@@ -138,7 +145,7 @@ typedef struct s_task {
 
 #define NR_GetTicks             0
 #define NR_SendRecv				1
-#define	NR_Write				2
+#define	NR_printx				2
 
 //====================================
 //					clock
@@ -152,11 +159,11 @@ typedef struct s_task {
 //====================================
 //					TTY
 //====================================
+//consle
 #define SCR_UP	1	/* scroll forward */
 #define SCR_DN	-1	/* scroll backward */
 #define SCREEN_SIZE		(80 * 25)
 #define SCREEN_WIDTH		80
-#define DEFAULT_CHAR_COLOR	0x07	/* 0000 0111 黑底白字 */
 
 #define	KB_IN_BYTES	32	/* size of keyboard input buffer */
 #define MAP_COLS	3	/* Number of columns in keymap */
@@ -176,7 +183,7 @@ typedef struct s_console
 	unsigned int	v_mem_limit;		/* 当前控制台占的显存大小 */
 	unsigned int	cursor;			/* 当前光标位置 */
 }CONSOLE;
-
+//tty
 #define TTY_IN_BYTES	256	/* tty input queue size */
 typedef struct s_tty
 {
@@ -248,3 +255,24 @@ struct _msg{
 };
 
 #define	RETVAL		u.m3.m3i1
+
+//========================================
+//				print
+//========================================
+// color
+#define BLACK   0x0     /* 0000 */
+#define WHITE   0x7     /* 0111 */
+#define RED     0x4     /* 0100 */
+#define GREEN   0x2     /* 0010 */
+#define BLUE    0x1     /* 0001 */
+#define FLASH   0x80    /* 1000 0000 */
+#define BRIGHT  0x08    /* 0000 1000 */
+#define	MAKE_COLOR(x,y)	((x<<4) | y) /* MAKE_COLOR(Background,Foreground) */
+
+
+/* magic chars used by `printx' */
+#define MAG_CH_PANIC	'\002'
+#define MAG_CH_ASSERT	'\003'
+#define DEFAULT_CHAR_COLOR	0x07	/* 0000 0111 黑底白字 */
+#define GRAY_CHAR		(MAKE_COLOR(BLACK, BLACK) | BRIGHT)
+#define RED_CHAR		(MAKE_COLOR(BLUE, RED) | BRIGHT)

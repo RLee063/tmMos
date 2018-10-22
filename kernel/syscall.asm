@@ -3,7 +3,7 @@
 ;=====================================================
 
 global  GetTicks
-global  Write
+global  printx
 global  SendRecv
 
 %include "sconst.inc"
@@ -21,9 +21,8 @@ SendRecv:
     int     INT_VECTOR_SYS_CALL
     ret
 
-Write:
-    mov eax, NR_Write
+printx:
+    mov eax, NR_printx
     mov     ecx, [esp + 4];buf
-    mov     edx, [esp + 8];length
     int     INT_VECTOR_SYS_CALL
     ret

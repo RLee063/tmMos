@@ -5,7 +5,8 @@ int printf(const char *fmt, ...)
 
 	char* arg = ((char*)(&fmt) + 4); /*4是参数fmt所占堆栈中的大小*/
 	i = vsprintf(buf, fmt, arg);
-	Write(buf, i);
+	buf[i] = 0;
+	printx(buf);
 	return i;
 }
 
