@@ -76,9 +76,7 @@ void initTty(TTY *pT)
 	pT->inbuf_count = 0;
 	pT->p_inbuf_head = pT->p_inbuf_tail = pT->in_buf;
 	initScreen(pT);
-	DispStr("initScreenOK!\n");
 	initKeyboard();
-	DispStr("initKeyboardOK!\n");
 }
 
 void ttyDoRead(TTY *pT)
@@ -111,7 +109,6 @@ void taskTty()
 	{
 		initTty(pTty);
 	}
-	DispStr("initTTYOK!\n");
 	select_console(0);
 	while (1)
 	{

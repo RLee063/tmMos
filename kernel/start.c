@@ -133,8 +133,8 @@ void initIDTAndSetIDTR(){
 }
 
 void cstart(){
+    DispPos=0;
     DispStr("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n------\"CSTART\"-----");
-
     initGDTAndSetGDTR();
     DispStr("GDT complete!\n");
     initIDTAndSetIDTR();

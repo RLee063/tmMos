@@ -9,12 +9,11 @@ int syscallPrintx(int unuse, int unuse2, char* s, PROCESS* pProc){
     // ttyWrite(&ttyTable[pProc->nr_tty], buf, length);
     // return 0;
     //---old---
-    	const char * p;
+    const char * p;
 	char ch;
 
 	char reenter_err[] = "? k_reenter is incorrect for unknown reason";
 	reenter_err[0] = MAG_CH_PANIC;
-
 	/**
 	 * @note Code in both Ring 0 and Ring 1~3 may invoke printx().
 	 * If this happens in Ring 0, no linear-physical address mapping
@@ -41,8 +40,12 @@ int syscallPrintx(int unuse, int unuse2, char* s, PROCESS* pProc){
 	 * if it fails in a USER PROC, it'll return like any normal syscall
 	 * does.
 	 */
+    if(*p == MAG_CH_ASSERT){
+        DispStr("MAG_CH_ASSERT\n");
+    }
 	if ((*p == MAG_CH_PANIC) ||
 	    (*p == MAG_CH_ASSERT && nextProc < &procTable[NR_TASKS])) {
+        DispStr("SYSTEM_ASSERT\n");
 		DisableInt();
 		char * v = (char*)V_MEM_BASE;
 		const char * q = p + 1; /* +1: skip the magic char */
@@ -69,7 +72,7 @@ int syscallPrintx(int unuse, int unuse2, char* s, PROCESS* pProc){
 
 		out_char(ttyTable[pProc->nr_tty].p_console, ch);
 	}
-
+    DispStr("SYSCALL_PRINT_RETURN\n");
 	return 0;
 }
 //==================================================================================
@@ -141,16 +144,16 @@ int syscallSendRecv(FUNCTION function, int srcDest, MESSAGE* pMsg, PROCESS* curr
 
 void taskSyscall(){
     MESSAGE msg;
-    printf("In the taskSyscall");
-    while(1){
-        SendRecv(RECEIVE, ANY, &msg);
-        int src = msg.source;
+    while(1){}
+    // while(1){
+    //     SendRecv(RECEIVE, ANY, &msg);
+    //     int src = msg.source;
 
-        switch(msg.type){
-            case GET_TICKS:
-                msg.RETVAL = ticks;
-                SendRecv(SEND, src, &msg);
-                break;
-        }
-    }
+    //     switch(msg.type){
+    //         case GET_TICKS:
+    //             msg.RETVAL = ticks;
+    //             SendRecv(SEND, src, &msg);
+    //             break;
+    //     }
+    // }
 }

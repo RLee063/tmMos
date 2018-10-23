@@ -108,7 +108,7 @@ typedef struct s_task {
 /* Number of tasks */
 #define NR_TASKS	2
 #define NR_USER_PROCS	3
-#define NR_PROCS	NR_TASKS+NR_USER_PROCS
+#define NR_PROCS	(NR_USER_PROCS + NR_TASKS)
 
 /* stacks of tasks */
 #define STACK_SIZE_TESTA		0x8000
@@ -276,3 +276,5 @@ struct _msg{
 #define DEFAULT_CHAR_COLOR	0x07	/* 0000 0111 黑底白字 */
 #define GRAY_CHAR		(MAKE_COLOR(BLACK, BLACK) | BRIGHT)
 #define RED_CHAR		(MAKE_COLOR(BLUE, RED) | BRIGHT)
+
+#define STR_DEFAULT_LEN 1024

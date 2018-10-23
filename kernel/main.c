@@ -73,8 +73,8 @@ void initProcTable(){
         selectorLdt += (1<<3);
     }
 	//=====
-	procTable[1].nr_tty = 1;
-	procTable[2].nr_tty = 2;
+	// procTable[1].nr_tty = 1;
+	// procTable[2].nr_tty = 2;
 	//======
     reEnterFlag = 0;
     nextProc = procTable;
@@ -84,15 +84,10 @@ int KernelMain()
 {
 	DispStr("----------------\"kernelMain\"----\n");
 	initSysCallTable();
-	DispStr("SysCallTable complete!\n");
 	DispInt(&DispPos);
-	DispStr(":&disPos\n");
 	DispInt(taskTty);
-	DispStr(":taskTty\n");
 	initClock();
-	DispStr("Clock complete!\n");
 	initProcTable();
-	DispStr("ProcTable complete!\n");
     restart();
     while(1){
 		DispStr("你永远见不到我");
@@ -104,6 +99,7 @@ int KernelMain()
  *======================================================================*/
 void TestA()
 {
+	assert(0);
 	while(1){
 		printf("hello?");
 		delay(3000);
@@ -114,6 +110,7 @@ void TestB()
 {
 	int i = 0x1086;
 	while(1){
+		assert(0>1);
 		printf("%x", i);
 		delay(3000);
 	}

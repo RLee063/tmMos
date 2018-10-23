@@ -41,6 +41,27 @@ void DispInt(int input)
 
 // }
 
+
+//===============================
+//				panic
+//===============================
+void panic(const char *fmt, ...)
+{
+	int i;
+	char buf[256];
+
+	/* 4 is the size of fmt in the stack */
+	char* arg = (char*)((char*)&fmt + 4);
+
+	i = vsprintf(buf, fmt, arg);
+
+	printl("%c !!panic!! %s", MAG_CH_PANIC, buf);
+
+	/* should never arrive here */
+	__asm__ ("ud2");
+}
+
+
 //===============================
 //				assertion
 //===============================
@@ -52,6 +73,7 @@ void spin(char * func_name)
 
 void assertion_failure(char *exp, char *file, char *base_file, int line)
 {
+	DispStr("assertion_failure!");
 	printl("%c  assert(%s) failed: file: %s, base_file: %s, ln%d",
 	       MAG_CH_ASSERT,
 	       exp, file, base_file, line);
@@ -78,7 +100,7 @@ void* va2la(int pid, void* va)
 	u32 la = seg_base + (u32)va;
 
 	if (pid < NR_TASKS + NR_PROCS) {
-		assert(la == (u32)va);
+		// assert(la == (u32)va);
 	}
 
 	return (void*)la;
