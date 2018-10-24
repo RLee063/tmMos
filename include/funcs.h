@@ -85,7 +85,7 @@ void hwint15();
 //Syscall
 void SysCall();
 
-int GetTicks();
+// int GetTicks();
 int syscallGetTicks();
 int printx(char*);
 int syscallPrintx(int unuse, int unuse2, char* buf, PROCESS* pProc);

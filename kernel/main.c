@@ -68,14 +68,17 @@ void initProcTable(){
 		pProc->nr_tty = 0;
         pTaskStack -= pTask->stacksize;
 		pProc->status = NORMAL;
+		pProc->senderQueue = 0;
+		pProc->sendTo = -1;
 
         pProc ++;
         selectorLdt += (1<<3);
     }
 	//=====
-	// procTable[1].nr_tty = 1;
-	// procTable[2].nr_tty = 2;
-	//======
+	procTable[1].nr_tty = 0;
+	procTable[2].nr_tty = 0;
+	procTable[3].nr_tty = 0;
+	//=====
     reEnterFlag = 0;
     nextProc = procTable;
 }
@@ -84,8 +87,6 @@ int KernelMain()
 {
 	DispStr("----------------\"kernelMain\"----\n");
 	initSysCallTable();
-	DispInt(&DispPos);
-	DispInt(taskTty);
 	initClock();
 	initProcTable();
     restart();
@@ -99,7 +100,6 @@ int KernelMain()
  *======================================================================*/
 void TestA()
 {
-	assert(0);
 	while(1){
 		printf("hello?");
 		delay(3000);
@@ -110,16 +110,14 @@ void TestB()
 {
 	int i = 0x1086;
 	while(1){
-		assert(0>1);
-		printf("%x", i);
-		delay(3000);
+		spin("testB");
 	}
 }
 
 void TestC()
 {
 	while(1){
-		delay(3000);
+		spin("testC");
 	}
 }
 

@@ -2,16 +2,15 @@
 ;					SYSCALL	
 ;=====================================================
 
-global  GetTicks
 global  printx
 global  SendRecv
 
 %include "sconst.inc"
 
-GetTicks:
-	mov	eax, NR_GetTicks
-	int		INT_VECTOR_SYS_CALL
-	ret
+; GetTicks:
+; 	mov	eax, NR_GetTicks
+; 	int		INT_VECTOR_SYS_CALL
+; 	ret
 
 SendRecv:
     mov eax, NR_SendRecv

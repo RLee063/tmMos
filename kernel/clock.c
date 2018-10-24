@@ -6,16 +6,10 @@
 
 void ClockClick(){
     ticks++;
-    //DispStr("#");
     if(reEnterFlag!=0){
-        //DispStr("!");
         return;
     }
-    nextProc++;
-    if(nextProc>=procTable+NR_TASKS+NR_USER_PROCS){
-        nextProc = procTable;
-    }
-    //schedule();
+    schedule();
 }
 
 void delay(int mSec){

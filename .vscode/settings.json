@@ -2,6 +2,8 @@
     "files.associations": {
         "global.h": "c",
         "funcs.h": "c",
-        "type.h": "c"
+        "type.h": "c",
+        "protect.h": "c",
+        "kernel.h": "c"
     }
 }

@@ -17,11 +17,3 @@ void schedule(){
     }
 }
 
-// void GetTicks(){
-//     MESSAGE msg;
-//     MemSet(&msg, 0, sizeof(MESSAGE));
-//     msg.type = GET_TICKS;
-//     SendRecv(SEND, TASK_SYS, &msg);
-//     SendRecv(RECEIVE, TASK_SYS, &msg);
-//     return msg.RETVAL;
-// }

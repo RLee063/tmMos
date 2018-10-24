@@ -83,13 +83,15 @@ typedef struct s_proc {
 	struct s_descriptor			ldts[LDT_SIZE];		/* local descriptors for code and data */
 								/* 2 is LDT_SIZE - avoid include protect.h */
 	u32				pid;			/* process id passed in from MM */
-	char				p_name[16];		/* name of the process */
+	char			p_name[16];		/* name of the process */
 	int 			nr_tty;
 	PROC_STATUS		status;
 	struct s_proc *		senderQueue;
 	int				receiveFrom;
 	int				sendTo;
-	MESSAGE *		msg;
+	MESSAGE *		pMsg;
+	int 			ticks;
+	int 			prio;
 }PROCESS;
 
 //TASK

@@ -35,11 +35,7 @@ void DispInt(int input)
     DispStr(output);
 }
 
-// int GetTicks(){
-// 	MESSAGE msg;
-// 	MemSet(&msg, 0, sizeof(MESSAGE));
 
-// }
 
 
 //===============================
