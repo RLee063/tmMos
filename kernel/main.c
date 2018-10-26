@@ -69,7 +69,9 @@ void initProcTable(){
         pTaskStack -= pTask->stacksize;
 		pProc->status = NORMAL;
 		pProc->senderQueue = 0;
-		pProc->sendTo = -1;
+		pProc->sendTo = NO_TASK;
+		pProc->receiveFrom = NO_TASK;
+		pProc->nextSender = 0;
 
         pProc ++;
         selectorLdt += (1<<3);
@@ -102,7 +104,7 @@ void TestA()
 {
 	while(1){
 		printf("hello?");
-		delay(3000);
+		delay(30000);
 	}
 }
 

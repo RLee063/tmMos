@@ -96,7 +96,7 @@ void* va2la(int pid, void* va)
 	u32 la = seg_base + (u32)va;
 
 	if (pid < NR_TASKS + NR_PROCS) {
-		// assert(la == (u32)va);
+		assert(la == (u32)va);
 	}
 
 	return (void*)la;

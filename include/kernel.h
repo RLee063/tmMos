@@ -87,11 +87,13 @@ typedef struct s_proc {
 	int 			nr_tty;
 	PROC_STATUS		status;
 	struct s_proc *		senderQueue;
+	struct s_proc * 	nextSender;
 	int				receiveFrom;
 	int				sendTo;
 	MESSAGE *		pMsg;
 	int 			ticks;
 	int 			prio;
+
 }PROCESS;
 
 //TASK
