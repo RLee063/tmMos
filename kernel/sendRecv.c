@@ -22,13 +22,38 @@ void unblock(PROCESS *pP)
 {
     pP->status = NORMAL;
 }
+
+int deadLock(int src, int dest){
+    PROCESS* p = procTable + dest;
+	while (1) {
+		if (p->status == SENDING) {
+			if (p->sendTo == src) {
+				/* print the chain */
+				p = procTable + dest;
+				printl("=_=%s", p->p_name);
+				do {
+					//assert(p->p_msg);
+					p = procTable + p->sendTo;
+					printl("->%s", p->p_name);
+				} while (p != procTable + src);
+				printl("=_=");
+
+				return 1;
+			}
+			p = procTable + p->sendTo;
+		}
+		else {
+			break;
+		}
+	}
+	return 0;
+}
 //=================================================================================
 
 void sendMessage(int dest, MESSAGE *pMsg, PROCESS *current)
 {
     assert(pProcToPid(current) != dest);
 
-    //检查死锁
     int currentPid = pProcToPid(current);
     current->pMsg = pMsg;
     PROCESS *pDest = pidToPPro(dest);
@@ -43,6 +68,9 @@ void sendMessage(int dest, MESSAGE *pMsg, PROCESS *current)
     }
     else
     {
+        if(deadLock(currentPid, dest)){
+            panic("DEAD_LOCK!");
+        }
         current->sendTo = dest;
         current->status = SENDING;
         PROCESS *p;
